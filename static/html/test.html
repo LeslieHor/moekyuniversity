@@ -1,0 +1,34 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+    <!-- when using the mode "code", it's important to specify charset utf-8 -->
+    <meta charset="utf-8">
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/jsoneditor/9.10.0/jsoneditor.min.css" rel="stylesheet" type="text/css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsoneditor/9.10.0/jsoneditor.min.js"></script>
+</head>
+<body>
+    <div id="jsoneditor" style="width: 400px; height: 400px;"></div>
+
+    <script>
+
+        function loadJson() {
+            fetch(jsonUrl)
+                .then(response => response.json())
+                .then(json => editor.set(json))
+        }
+        // create the editor
+        const container = document.getElementById("jsoneditor")
+        const options = {}
+        const editor = new JSONEditor(container, options)
+        const jsonUrl = "http://localhost:8080/card/1/json"
+
+        // fetch the json and set it in the editor
+        loadJson()
+
+        // get json
+        const updatedJson = editor.get()
+    
+    </script>
+</body>
+</html>

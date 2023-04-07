@@ -1,0 +1,77 @@
+{{ define "windowtitle" }}Edit: {{.CardDataTree.Card.ID}} - {{.CardDataTree.Card.Characters}}{{ end }}
+{{ define "title" }}
+Editing:
+<span class="id">{{.CardDataTree.Card.ID}} - </span>
+<span class="characters {{.CardDataTree.Card.Object}}-highlight">{{if .CardDataTree.Card.CharacterImage}}<img
+        class="title-character-image"
+        src="/img/cards/{{.CardDataTree.Card.CharacterImage}}" />{{else}}{{.CardDataTree.Card.Characters}}{{end}}</span>
+{{if .CardDataTree.Card.Level}}<span class="level">Level {{.CardDataTree.Card.Level}}</span>{{end}}
+{{ end }}
+{{ define "head" }}
+<link href="/static/js/jsoneditor/jsoneditor.min.css" rel="stylesheet" type="text/css">
+<script src="/static/js/jsoneditor/jsoneditor.min.js"></script>
+<link href="/static/js/jsoneditor/darktheme.css" rel="stylesheet" type="text/css">
+{{ end }}
+{{ define "scripts" }}
+{{ end }}
+
+{{ define "content" }}
+<div class="links">
+    <a href="{{.CardDataTree.Card.DocumentURL}}">View on Wanikani</a>
+    |
+    <a href="https://jisho.org/search/{{.CardDataTree.Card.Characters}}">View on Jisho</a>
+    |
+    <a onClick="saveJson()">Save</a>
+</div>
+
+<hr>
+
+<div id="jsoneditor"></div>
+
+<script>
+    function loadJson() {
+        // Fetches the json from the server and sets it in the editor
+        // Then expands all nodes
+        fetch(jsonUrl)
+            .then(response => response.json())
+            .then(json => editor.set(json))
+            .then(() => editor.expandAll())
+    }
+
+    function saveJson() {
+        // Sends the updated json to the server
+        const updatedJson = editor.get()
+        fetch(jsonSaveUrl, {
+            method: 'POST',
+            body: JSON.stringify(updatedJson),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(response => {
+            if (response.ok) {
+                // Redirect to the card page
+                window.location.href = "/card/{{.CardDataTree.Card.ID}}"
+            } else {
+                alert("Error saving!")
+            }
+        })
+    }
+    // create the editor
+    const container = document.getElementById("jsoneditor")
+    const options = {
+        mode: 'tree',
+        modes: ['code', 'form', 'text', 'tree', 'view', 'preview'], // allowed modes
+        onModeChange: function (newMode, oldMode) {
+            console.log('Mode switched from', oldMode, 'to', newMode)
+        }
+    }
+    const editor = new JSONEditor(container, options)
+
+    const jsonUrl = "/card/{{.CardDataTree.Card.ID}}/json"
+    const jsonSaveUrl = "/card/{{.CardDataTree.Card.ID}}/edit/save"
+
+    // fetch the json and set it in the editor
+    loadJson()
+</script>
+
+{{ end }}
