@@ -114,6 +114,25 @@ func main() {
 	// Set review performance
 	radicals[0].TotalTimesReviewed = 101
 	radicals[0].TotalTimesCorrect = 95
+	
+	// A card that has no characters
+	i++
+	cs[i] = &cards.Card{
+		ID: i,
+		Object: "radical",
+		Characters: "",
+		CharacterImage: "radical_stick.png",
+		CharacterAlt: "Stick",
+		Meanings: []struct {
+		   Meaning string `json:"meaning"`
+		   Primary bool `json:"primary"`
+		   AcceptedAnswer bool `json:"accepted_answer"`
+	   }{
+		   {"Stick", true, true},
+		   {"two", false, false},
+		   {"three", false, false},
+	   },
+	}
 
 	cardData.Cards = cs
 	cardData.SaveCardMap()

@@ -116,6 +116,11 @@ a {
     font-size: 1.0em;
 }
 
+.title .title-character-image {
+    width: 30px;
+    height: auto;
+}
+
 .section {
     margin: 0.5em 0;
 }
@@ -167,6 +172,15 @@ a {
     height: 0.5em;
     padding: 0.2em 0.3em;
     width: inherit;
+}
+
+.character-image-container {
+    padding: 10px;
+}
+
+.character-image {
+    width: 30px;
+    height: auto;
 }
 
 .cardjp {
