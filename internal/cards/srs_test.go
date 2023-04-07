@@ -30,6 +30,13 @@ func TestCorrectLearningToLearning(t *testing.T) {
 	if c.NextReviewDate != ExpectedNextReviewDate {
 		t.Errorf("Incorrect next review date. Expected %s, got %s", ExpectedNextReviewDate, c.NextReviewDate)
 	}
+
+	if c.TotalTimesReviewed != 1 {
+		t.Errorf("Incorrect total times reviewed. Expected 1, got %d", c.TotalTimesReviewed)
+	}
+	if c.TotalTimesCorrect != 1 {
+		t.Errorf("Incorrect total times correct. Expected 1, got %d", c.TotalTimesCorrect)
+	}
 }
 
 func TestCorrectLearningToLearned(t *testing.T) {
@@ -56,6 +63,13 @@ func TestCorrectLearningToLearned(t *testing.T) {
 	ExpectedNextReviewDate := time.Now().Add(time.Hour * 24).Round(time.Hour).Format(time.RFC3339)
 	if c.NextReviewDate != ExpectedNextReviewDate {
 		t.Errorf("Incorrect next review date. Expected %s, got %s", ExpectedNextReviewDate, c.NextReviewDate)
+	}
+
+	if c.TotalTimesReviewed != 1 {
+		t.Errorf("Incorrect total times reviewed. Expected 1, got %d", c.TotalTimesReviewed)
+	}
+	if c.TotalTimesCorrect != 1 {
+		t.Errorf("Incorrect total times correct. Expected 1, got %d", c.TotalTimesCorrect)
 	}
 }
 
@@ -84,6 +98,13 @@ func TestCorrectLearnedToLearned(t *testing.T) {
 	if c.NextReviewDate != ExpectedNextReviewDate {
 		t.Errorf("Incorrect next review date. Expected %s, got %s", ExpectedNextReviewDate, c.NextReviewDate)
 	}
+
+	if c.TotalTimesReviewed != 1 {
+		t.Errorf("Incorrect total times reviewed. Expected 1, got %d", c.TotalTimesReviewed)
+	}
+	if c.TotalTimesCorrect != 1 {
+		t.Errorf("Incorrect total times correct. Expected 1, got %d", c.TotalTimesCorrect)
+	}
 }
 
 func TestCorrectLearnedToBurned(t *testing.T) {
@@ -109,6 +130,13 @@ func TestCorrectLearnedToBurned(t *testing.T) {
 	if c.NextReviewDate != "" {
 		t.Errorf("Incorrect next review date. Expected empty string, got %s", c.NextReviewDate)
 	}
+
+	if c.TotalTimesReviewed != 1 {
+		t.Errorf("Incorrect total times reviewed. Expected 1, got %d", c.TotalTimesReviewed)
+	}
+	if c.TotalTimesCorrect != 1 {
+		t.Errorf("Incorrect total times correct. Expected 1, got %d", c.TotalTimesCorrect)
+	}
 }
 
 func TestIncorrectLearningToLearningMinimum(t *testing.T) {
@@ -118,6 +146,8 @@ func TestIncorrectLearningToLearningMinimum(t *testing.T) {
 		LearningInterval: 3, // 3 hours
 		LearningStage: 2,
 		NextReviewDate: "2020-01-01T00:00:00Z", // Any date in the past
+		TotalTimesReviewed: 5,
+		TotalTimesCorrect: 3,
 	}
 
 	c.IncorrectAnswer()
@@ -137,6 +167,13 @@ func TestIncorrectLearningToLearningMinimum(t *testing.T) {
 	if c.NextReviewDate != ExpectedNextReviewDate {
 		t.Errorf("Incorrect next review date. Expected %s, got %s", ExpectedNextReviewDate, c.NextReviewDate)
 	}
+
+	if c.TotalTimesReviewed != 6 {
+		t.Errorf("Incorrect total times reviewed. Expected 6, got %d", c.TotalTimesReviewed)
+	}
+	if c.TotalTimesCorrect != 3 {
+		t.Errorf("Incorrect total times correct. Expected 3, got %d", c.TotalTimesCorrect)
+	}
 }
 
 func TestIncorrectLearningToLearning(t *testing.T) {
@@ -146,6 +183,8 @@ func TestIncorrectLearningToLearning(t *testing.T) {
 		LearningInterval: 12, // 12 hours
 		LearningStage: 2,
 		NextReviewDate: "2020-01-01T00:00:00Z", // Any date in the past
+		TotalTimesReviewed: 5,
+		TotalTimesCorrect: 3,
 	}
 
 	c.IncorrectAnswer()
@@ -166,6 +205,13 @@ func TestIncorrectLearningToLearning(t *testing.T) {
 	if c.NextReviewDate != ExpectedNextReviewDate {
 		t.Errorf("Incorrect next review date. Expected %s, got %s", ExpectedNextReviewDate, c.NextReviewDate)
 	}
+
+	if c.TotalTimesReviewed != 6 {
+		t.Errorf("Incorrect total times reviewed. Expected 6, got %d", c.TotalTimesReviewed)
+	}
+	if c.TotalTimesCorrect != 3 {
+		t.Errorf("Incorrect total times correct. Expected 3, got %d", c.TotalTimesCorrect)
+	}
 }
 
 func TestIncorrectLearnedToLearning(t *testing.T) {
@@ -175,6 +221,8 @@ func TestIncorrectLearnedToLearning(t *testing.T) {
 		LearningInterval: 0,
 		LearningStage: 3,
 		NextReviewDate: "2020-01-01T00:00:00Z", // Any date in the past
+		TotalTimesReviewed: 5,
+		TotalTimesCorrect: 3,
 	}
 
 	c.IncorrectAnswer()
@@ -194,6 +242,13 @@ func TestIncorrectLearnedToLearning(t *testing.T) {
 	ExpectedNextReviewDate := time.Now().Add(10 * time.Minute).Round(time.Minute).Format(time.RFC3339)
 	if c.NextReviewDate != ExpectedNextReviewDate {
 		t.Errorf("Incorrect next review date. Expected %s, got %s", ExpectedNextReviewDate, c.NextReviewDate)
+	}
+
+	if c.TotalTimesReviewed != 6 {
+		t.Errorf("Incorrect total times reviewed. Expected 6, got %d", c.TotalTimesReviewed)
+	}
+	if c.TotalTimesCorrect != 3 {
+		t.Errorf("Incorrect total times correct. Expected 3, got %d", c.TotalTimesCorrect)
 	}
 
 	// Getting the review wrong again should not halve the interval again
@@ -216,6 +271,13 @@ func TestIncorrectLearnedToLearning(t *testing.T) {
 	ExpectedNextReviewDate = time.Now().Add(10 * time.Minute).Round(time.Minute).Format(time.RFC3339)
 	if c.NextReviewDate != ExpectedNextReviewDate {
 		t.Errorf("Incorrect next review date. Expected %s, got %s", ExpectedNextReviewDate, c.NextReviewDate)
+	}
+
+	if c.TotalTimesReviewed != 7 {
+		t.Errorf("Incorrect total times reviewed. Expected 7, got %d", c.TotalTimesReviewed)
+	}
+	if c.TotalTimesCorrect != 3 {
+		t.Errorf("Incorrect total times correct. Expected 3, got %d", c.TotalTimesCorrect)
 	}
 }
 
@@ -251,6 +313,13 @@ func TestCorrectRelearningToRelearning(t *testing.T) {
 	if c.NextReviewDate != ExpectedNextReviewDate {
 		t.Errorf("Incorrect next review date. Expected %s, got %s", ExpectedNextReviewDate, c.NextReviewDate)
 	}
+
+	if c.TotalTimesReviewed != 1 {
+		t.Errorf("Incorrect total times reviewed. Expected 1, got %d", c.TotalTimesReviewed)
+	}
+	if c.TotalTimesCorrect != 1 {
+		t.Errorf("Incorrect total times correct. Expected 1, got %d", c.TotalTimesCorrect)
+	}
 }
 
 func TestCorrectRelearningToLearned(t *testing.T) {
@@ -284,6 +353,13 @@ func TestCorrectRelearningToLearned(t *testing.T) {
 	ExpectedNextReviewDate := time.Now().Add(5 * 24 * time.Hour).Round(time.Hour).Format(time.RFC3339)
 	if c.NextReviewDate != ExpectedNextReviewDate {
 		t.Errorf("Incorrect next review date. Expected %s, got %s", ExpectedNextReviewDate, c.NextReviewDate)
+	}
+
+	if c.TotalTimesReviewed != 1 {
+		t.Errorf("Incorrect total times reviewed. Expected 1, got %d", c.TotalTimesReviewed)
+	}
+	if c.TotalTimesCorrect != 1 {
+		t.Errorf("Incorrect total times correct. Expected 1, got %d", c.TotalTimesCorrect)
 	}
 }
 

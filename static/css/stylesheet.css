@@ -295,3 +295,8 @@ a {
 .srs-not-accepted {
     color: rgb(112, 111, 111);
 }
+
+.banner {
+    text-align: center;
+    font-size: 3.0em;
+}

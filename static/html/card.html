@@ -71,6 +71,13 @@
 </div>
 {{end}}
 
+{{ if .Card.TotalTimesReviewed }}
+<div class="section">
+    <span class="heading">Review Performance:</span>
+    <span class="review-performance">{{.Card.TotalTimesCorrect}} / {{.Card.TotalTimesReviewed}} ({{ percent .Card.TotalTimesCorrect .Card.TotalTimesReviewed }}%)</span>
+</div>
+{{end}}
+
 <hr>
 
 {{if .Card.PartsOfSpeech}}

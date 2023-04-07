@@ -14,6 +14,7 @@ type CardData struct {
 	CardsFile string
 	BackupDir string
 	StaticDir string
+	FuncMap map[string]interface{}
 	Cards map[int]*Card
 }
 
@@ -185,6 +186,18 @@ func filterCardsByPartsOfSpeech(cardData []*Card, partOfSpeech string) []*Card {
 	return cards
 }
 
+func filterCardsByReviewPerformance(cardData []*Card, lowerBound float64, upperBound float64) []*Card {
+	var cards []*Card
+	for _, card := range cardData {
+		// Calculate review performance
+		performance := card.GetReviewPerformance()
+		if performance >= lowerBound && performance <= upperBound {
+			cards = append(cards, card)
+		}
+	}
+	return cards
+}
+
 func sortCardsById(cards []*Card) []*Card {
 	sort.Slice(cards, func(i, j int) bool {
 		return cards[i].ID < cards[j].ID
@@ -219,6 +232,13 @@ func sortCardsByDue(cards []*Card) []*Card {
 
 		return t.Before(t2)
 		})
+	return cards
+}
+
+func sortCardsByReviewPerformance(cards []*Card) []*Card {
+	sort.Slice(cards, func(i, j int) bool {
+		return cards[i].GetReviewPerformance() > cards[j].GetReviewPerformance()
+	})
 	return cards
 }
 

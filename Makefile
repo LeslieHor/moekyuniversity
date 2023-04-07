@@ -12,3 +12,6 @@ start:
 
 test:
 	go test -mod vendor -v ./...
+
+generate-test-data:
+	go run -mod vendor cmd/generatetestdata.go -cards-file data/cards.json
