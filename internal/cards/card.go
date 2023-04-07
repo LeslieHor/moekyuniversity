@@ -1,8 +1,6 @@
 package cards
 
-import (
-
-)
+import ()
 
 type LearningStage int
 
@@ -25,35 +23,35 @@ var LearningStages = []LearningStage{
 }
 
 type Card struct {
-	ID    int    `json:"id"`
-	Object string `json:"object"`
-	Level int    `json:"level"`
-	DocumentURL string `json:"document_url"`
-	Characters string `json:"characters"`
+	ID             int    `json:"id"`
+	Object         string `json:"object"`
+	Level          int    `json:"level"`
+	DocumentURL    string `json:"document_url"`
+	Characters     string `json:"characters"`
 	CharacterImage string `json:"character_image"`
-	CharacterAlt string `json:"character_alt"`
-	Meanings []struct {
-		Meaning string `json:"meaning"`
-		Primary bool `json:"primary"`
-		AcceptedAnswer bool `json:"accepted_answer"`
+	CharacterAlt   string `json:"character_alt"`
+	Meanings       []struct {
+		Meaning        string `json:"meaning"`
+		Primary        bool   `json:"primary"`
+		AcceptedAnswer bool   `json:"accepted_answer"`
 	} `json:"meanings"`
 	Readings []struct {
-		Reading string `json:"reading"`
-		Type string `json:"type"`
-		Primary bool `json:"primary"`
-		AcceptedAnswer bool `json:"accepted_answer"`
+		Reading        string `json:"reading"`
+		Type           string `json:"type"`
+		Primary        bool   `json:"primary"`
+		AcceptedAnswer bool   `json:"accepted_answer"`
 	} `json:"readings"`
-	PartsOfSpeech []string `json:"parts_of_speech"`
-	ComponentSubjectIDs []int `json:"component_subject_ids"`
-	AmalgamationSubjectIDs []int `json:"amalgamation_subject_ids"`
-	ReadingMnemonic string `json:"reading_mnemonic"`
-	MeaningMnemonic string `json:"meaning_mnemonic"`
+	PartsOfSpeech          []string `json:"parts_of_speech"`
+	ComponentSubjectIDs    []int    `json:"component_subject_ids"`
+	AmalgamationSubjectIDs []int    `json:"amalgamation_subject_ids"`
+	ReadingMnemonic        string   `json:"reading_mnemonic"`
+	MeaningMnemonic        string   `json:"meaning_mnemonic"`
 
-	Interval int `json:"interval"` // Hours until next review
-	LearningInterval int `json:"learning_interval"` // Hours until next review when in learning stage
-	NextReviewDate string `json:"next_review_date"` // RFC3339 date string
-	TotalTimesReviewed int `json:"total_times_reviewed"`
-	TotalTimesCorrect int `json:"total_times_correct"`
+	Interval           int    `json:"interval"`          // Hours until next review
+	LearningInterval   int    `json:"learning_interval"` // Hours until next review when in learning stage
+	NextReviewDate     string `json:"next_review_date"`  // RFC3339 date string
+	TotalTimesReviewed int    `json:"total_times_reviewed"`
+	TotalTimesCorrect  int    `json:"total_times_correct"`
 
 	LearningStage LearningStage `json:"learning_stage"` // 0 = Unavailable, 1 = Available, 2 = Learning, 3 = Learned, 4 = Burned
 

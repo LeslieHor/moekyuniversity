@@ -7,9 +7,8 @@ import (
 	"encoding/json"
 	"time"
 	"log"
-	"regexp"
-	"strings"
 	"path/filepath"
+	"io/ioutil"
 
 	"github.com/gorilla/mux"
 )
@@ -30,9 +29,10 @@ func SetupRoutes(cd *CardData) {
 	r.PathPrefix("/img/").Handler(http.FileServer(http.Dir(cd.StaticDir)))
 
 	r.HandleFunc("/card/{id}", cd.CardHandler)
-	r.HandleFunc("/card/{id}/json", cd.CardRawHandler)
-	r.HandleFunc("/card/{id}/edit", cd.CardEditHandler)
-	r.HandleFunc("/card/{id}/edit/save", cd.CardEditPostHandler)
+	r.HandleFunc("/card/{id}/raw", cd.CardRawHandler)
+	r.HandleFunc("/card/{id}/json", cd.CardJsonHandler)
+	r.HandleFunc("/card/{id}/edit", cd.CardJsonEditHandler)
+	r.HandleFunc("/card/{id}/edit/save", cd.CardJsonEditSaveHandler)
 
 	r.HandleFunc("/cardoverview", cd.OverviewByLearningStageHandler)
 	r.HandleFunc("/cardoverview/bylearningstage", cd.OverviewByLearningStageHandler)
@@ -131,6 +131,25 @@ func (cd *CardData) CardRawHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write(json)
 }
 
+func (cd *CardData) CardJsonHandler(w http.ResponseWriter, r *http.Request) {
+	// Get card ID from URL
+	vars := mux.Vars(r)
+	id, err := strconv.Atoi(vars["id"])
+	if err != nil {
+		panic(err)
+	}
+	c := cd.GetCard(id)
+
+	// Convert the card data tree to json and write it to the response
+	json, err := json.Marshal(c)
+	if err != nil {
+		panic(err)
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(json)
+}
+
 type CardEditData struct {
 	CardDataTree CardDataTree
 	LearningStages []struct{
@@ -143,7 +162,7 @@ type CardEditData struct {
 	}
 }
 
-func (cd *CardData) CardEditHandler(w http.ResponseWriter, r *http.Request) {
+func (cd *CardData) CardJsonEditHandler(w http.ResponseWriter, r *http.Request) {
 	// Get card ID from URL
 	vars := mux.Vars(r)
 	id, err := strconv.Atoi(vars["id"])
@@ -152,94 +171,58 @@ func (cd *CardData) CardEditHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	c := cd.GetCard(id)
 	dt := c.GetDataTree(cd)
-
-	// Get the learning stages and their string representation
-	var learningStages []struct{
-		Value LearningStage
-		Text string
-	}
-	for _, ls := range LearningStages {
-		learningStages = append(learningStages, struct{
-			Value LearningStage
-			Text string
-		}{
-			Value: ls,
-			Text: LearningStageToString(ls),
-		})
-	}
-
-	// Get all the parts of speech whether the current card has them or not
-	var partsOfSpeech []struct{
-		Text string
-		Selected bool
-	}
-	for _, pos := range cd.GetPartsOfSpeech() {
-		// Check if the current card has the part of speech
-		selected := containsString(c.PartsOfSpeech, pos)
-
-		partsOfSpeech = append(partsOfSpeech, struct{
-			Text string
-			Selected bool
-		}{
-			Text: pos,
-			Selected: selected,
-		})
-	}
-
 	editData := CardEditData{
 		CardDataTree: dt,
-		LearningStages: learningStages,
-		PartsOfSpeech: partsOfSpeech,
 	}
 
-	cd.doTemplate(w, r, "cardedit.html", editData)
+	cd.doTemplate(w, r, "cardjsonedit.html", editData)
 }
 
-func (cd *CardData) CardEditPostHandler(w http.ResponseWriter, r *http.Request) {
+func (cd *CardData) CardJsonEditSaveHandler(w http.ResponseWriter, r *http.Request) {
 	// Get card ID from URL
 	vars := mux.Vars(r)
 	id, err := strconv.Atoi(vars["id"])
 	if err != nil {
 		panic(err)
 	}
-	c := cd.GetCard(id)
+	log.Printf("Saving card %d", id)
 
-	// Get the card data from the form
-	r.ParseForm()
-	
-	// Get component subject ids and parse into a slice of ints
-	// Example input from form: '["1", "2", "3"]'
-	componentSubjectIds := r.FormValue("componentSubjectIds")
-	log.Printf("componentSubjectIds: %s", componentSubjectIds)
-	
-	// Strip any non numeric or non-comma characters from the string
-	re := regexp.MustCompile("[^0-9,]")
-	componentSubjectIds = re.ReplaceAllString(componentSubjectIds, "")
-
-	// Split the string by commas
-	s := strings.Split(componentSubjectIds, ",")
-
-	var componentSubjectIdsInt []int
-	// Parse the string slice into an int slice
-	for _, id := range s {
-		log.Printf("id: %s", id)
-		idInt, err := strconv.Atoi(id)
-		if err != nil {
-			panic(err)
-		}
-		componentSubjectIdsInt = append(componentSubjectIdsInt, idInt)
+	// Get the json data from the request
+	jsonData, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		panic(err)
 	}
-	log.Printf("componentSubjectIdsInt: %v", componentSubjectIdsInt)
 
-	// Assign the card data
-	c.ComponentSubjectIDs = componentSubjectIdsInt
+	// Log the json data
+	log.Printf("JSON data: %s", jsonData)
 
+	// Attempt to unmarshal the json data into a card
+	var c Card
+	err = json.Unmarshal(jsonData, &c)
+	if err != nil {
+		log.Printf("Error unmarshalling json data: %s", err)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	// Validate the NextReviewDate is a valid date
+	if c.NextReviewDate != "" {
+		_, err = time.Parse(time.RFC3339, c.NextReviewDate)
+		if err != nil {
+			log.Printf("Error parsing NextReviewDate: %s", err)
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+	}
+
+	// Save the card
+	cd.Cards[id] = &c
 	cd.UpdateCardData()
 	cd.SaveCardMap()
-	// Redirect to the card page
-	http.Redirect(w, r, "/card/" + strconv.Itoa(id), http.StatusSeeOther)
-}
 
+	// Send an ok response
+	w.WriteHeader(http.StatusOK)
+}
 
 type CardOverviewData struct {
 	Title string
