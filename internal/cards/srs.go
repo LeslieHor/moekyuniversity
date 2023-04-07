@@ -104,6 +104,8 @@ func (c *Card) CorrectAnswer() {
 		c.LearningInterval = 3
 	}
 
+	c.IncrementReviewCount()
+	c.IncrementCorrectAnswerCount()
 	c.SetNextReviewDate()
 }
 
@@ -137,6 +139,7 @@ func (c *Card) IncorrectAnswer() {
 		c.LearningInterval = 3 // Initial LearningInterval is 3 hours
 	}
 
+	c.IncrementReviewCount()
 	c.SetNextFailedReviewDate()
 }
 

@@ -50,6 +50,8 @@ type Card struct {
 	Interval int `json:"interval"` // Hours until next review
 	LearningInterval int `json:"learning_interval"` // Hours until next review when in learning stage
 	NextReviewDate string `json:"next_review_date"` // RFC3339 date string
+	TotalTimesReviewed int `json:"total_times_reviewed"`
+	TotalTimesCorrect int `json:"total_times_correct"`
 
 	LearningStage LearningStage `json:"learning_stage"` // 0 = Unavailable, 1 = Available, 2 = Learning, 3 = Learned, 4 = Burned
 
@@ -123,4 +125,20 @@ func (c *Card) GetLearningStageString() string {
 
 func (c *Card) GetPartsOfSpeech() []string {
 	return c.PartsOfSpeech
+}
+
+func (c *Card) GetReviewPerformance() float64 {
+	if c.TotalTimesReviewed == 0 {
+		return 0
+	}
+
+	return float64(c.TotalTimesCorrect) / float64(c.TotalTimesReviewed)
+}
+
+func (c *Card) IncrementReviewCount() {
+	c.TotalTimesReviewed++
+}
+
+func (c *Card) IncrementCorrectAnswerCount() {
+	c.TotalTimesCorrect++
 }

@@ -15,6 +15,8 @@ import (
 )
 
 func SetupRoutes(cd *CardData) {
+	cd.SetupFuncMap()
+	
 	r := mux.NewRouter()
 
 	r.HandleFunc("/", cd.IndexHandler)
@@ -41,6 +43,7 @@ func SetupRoutes(cd *CardData) {
 	r.HandleFunc("/cardoverview/bydue", cd.OverviewByDueHandler)
 	r.HandleFunc("/cardoverview/bytype", cd.OverviewByTypeHandler)
 	r.HandleFunc("/cardoverview/bypartsofspeech", cd.OverviewByPartsOfSpeechHandler)
+	r.HandleFunc("/cardoverview/byreviewperformance", cd.OverviewByReviewPerformanceHandler)
 	r.HandleFunc("/cardoverview/debug", cd.OverviewDebugHandler)
 
 	r.HandleFunc("/srs", cd.SrsHandler)
@@ -52,11 +55,37 @@ func SetupRoutes(cd *CardData) {
 	http.ListenAndServe(":8080", r)
 }
 
+func (cd *CardData) SetupFuncMap() {
+	funcMap := template.FuncMap{
+		"add": func(a, b int) int {
+			return a + b
+		},
+		"sub": func(a, b int) int {
+			return a - b
+		},
+		"div": func(a, b int) int {
+			return a / b
+		},
+		"mod": func(a, b int) int {
+			return a % b
+		},
+		"mul": func(a, b int) int {
+			return a * b
+		},
+		"percent": func(a, b int) int {
+			return a * 100 / b
+		},
+	}
+	cd.FuncMap = funcMap
+}
+
+
 func (cd *CardData) doTemplate(w http.ResponseWriter, r *http.Request, templateName string, data interface{}) {
 	htmlDir := filepath.Join(cd.StaticDir, "html")
 	templatemainFile := filepath.Join(htmlDir, "templatemain.html")
 	templateFile := filepath.Join(htmlDir, templateName)
-	t, err := template.ParseFiles(templatemainFile, templateFile)
+	// Load template with custom function map
+	t, err := template.New("templatemain.html").Funcs(cd.FuncMap).ParseFiles(templatemainFile, templateFile)
 	if err != nil {
 		panic(err)
 	}
@@ -350,6 +379,35 @@ func (cd *CardData) OverviewByPartsOfSpeechHandler(w http.ResponseWriter, r *htt
 		o := NewCardOverviewData(pos, cs, lc, true)
 		codl = append(codl, o)
 	}
+
+	cd.doTemplate(w, r, "cardoverview.html", codl)
+}
+
+func (cd *CardData) OverviewByReviewPerformanceHandler(w http.ResponseWriter, r *http.Request) {
+	codl := []CardOverviewData{}
+	cardList := cd.ToList()
+	cl := append(filterCardsByLearningStage(cardList, Learning), filterCardsByLearningStage(cardList, Learned)...)
+	cl = append(cl, filterCardsByLearningStage(cardList, Burned)...)
+
+	cs := filterCardsByReviewPerformance(cl, 0, 0.5)
+	cs = sortCardsByReviewPerformance(cs)
+	o := NewCardOverviewData("0% - 50%", cs, 0, false)
+	codl = append(codl, o)
+
+	cs = filterCardsByReviewPerformance(cl, 0.5, 0.75)
+	cs = sortCardsByReviewPerformance(cs)
+	o = NewCardOverviewData("50% - 75%", cs, 0, false)
+	codl = append(codl, o)
+
+	cs = filterCardsByReviewPerformance(cl, 0.75, 0.95)
+	cs = sortCardsByReviewPerformance(cs)
+	o = NewCardOverviewData("75% - 95%", cs, 0, false)
+	codl = append(codl, o)
+
+	cs = filterCardsByReviewPerformance(cl, 0.95, 1)
+	cs = sortCardsByReviewPerformance(cs)
+	o = NewCardOverviewData("95% - 100%", cs, 0, false)
+	codl = append(codl, o)
 
 	cd.doTemplate(w, r, "cardoverview.html", codl)
 }
