@@ -8,18 +8,6 @@ Learn your Japanese vocabulary with spaced repetition. Set up dependencies betwe
 
 **Currently there is no way to use this program without manually creating you own data files.**
 
-## Planned Features
-- Ability to edit data
-    - Adding custom components (Partly done in an ugly way)
-- Ability to add new words / cards
-- Parse text and display known words in a different colour, percentage of comprehension, etc.
-- Show cards that are frequently incorrect
-- Show schedule of future reviews
-- Show simulated reviews projected into the future
-- Show approximate reading coverage of major sources
-- Show historical data and stats
-- Grammar
-
 ## The Algorithm
 Moe Kyuniversity uses an extremely simplified SRS algorithm.
 
