@@ -1,7 +1,7 @@
-{{ define "windowtitle" }}{{.Card.ID}} - {{.Card.Characters}}{{ end }}
+{{ define "windowtitle" }}{{.Card.ID}} - {{if .Card.CharacterAlt}}{{.Card.CharacterAlt}}{{else}}{{.Card.Characters}}{{end}}{{ end }}
 {{ define "title" }}
 <span class="id">{{.Card.ID}} - </span>
-<span class="characters {{.Card.Object}}-highlight">{{.Card.Characters}}</span>
+<span class="characters {{.Card.Object}}-highlight">{{if .Card.CharacterImage}}<img class="title-character-image" src="/img/cards/{{.Card.CharacterImage}}"/>{{else}}{{.Card.Characters}}{{end}}</span>
 {{if .Card.Level}}<span class="level">Level {{.Card.Level}}</span>{{end}}
 {{ end }}
 
@@ -11,10 +11,13 @@
     <div class="card">
         <div class="cardtop {{.Card.Object}}-highlight">
             <a href="{{.Card.ID}}">
-                {{if not .Card.Characters}}
-                <div style="background-color: red;">ERR</div>
-                {{end}}
+                {{if .Card.CharacterImage}}
+                <div class="character-image-container">
+                    <img class="character-image" src="/img/cards/{{.Card.CharacterImage}}"/>
+                </div>
+                {{else}}
                 <div class="cardjp">{{.Card.Characters}}</div>
+                {{end}}
                 <div>{{ (index .Card.Meanings 0).Meaning }}</div>
             </a>
         </div>

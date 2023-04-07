@@ -176,6 +176,16 @@ func filterCardsByMissingCharacters(cardData []*Card) []*Card {
 	return cards
 }
 
+func filterCardsByMissingCharacterImage(cardData []*Card) []*Card {
+	var cards []*Card
+	for _, card := range cardData {
+		if card.CharacterImage == "" {
+			cards = append(cards, card)
+		}
+	}
+	return cards
+}
+
 func filterCardsByPartsOfSpeech(cardData []*Card, partOfSpeech string) []*Card {
 	var cards []*Card
 	for _, card := range cardData {

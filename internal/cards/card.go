@@ -30,6 +30,8 @@ type Card struct {
 	Level int    `json:"level"`
 	DocumentURL string `json:"document_url"`
 	Characters string `json:"characters"`
+	CharacterImage string `json:"character_image"`
+	CharacterAlt string `json:"character_alt"`
 	Meanings []struct {
 		Meaning string `json:"meaning"`
 		Primary bool `json:"primary"`

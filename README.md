@@ -2,6 +2,8 @@
 
 Learn your Japanese vocabulary with spaced repetition. Set up dependencies between cards, and learn them in the correct order.
 
+You should use Wanikani to learn instead of this project. Wanikani is great. This project is not.
+
 **NOT FOR USE YET.**
 
 **Project is still in early development.**

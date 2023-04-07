@@ -1,48 +1,51 @@
 {{ define "windowtitle" }}Card Overview{{ end }}
 {{ define "title" }}Card Overview{{ end }}
-    
-{{ define "content" }}
-    <div class="links">
-        <a href="/cardoverview/bylearningstage">By Learning Stage</a>
-        | 
-        <a href="/cardoverview/bylevel">By Level</a>
-        |
-        <a href="/cardoverview/bydue">By Due</a>
-        |
-        <a href="/cardoverview/bytype">By Type</a>
-        |
-        <a href="/cardoverview/bypartsofspeech">By Parts of Speech</a>
-        |
-        <a href="/cardoverview/byreviewperformance">By Review Performance</a>
-        |
-        <a href="/cardoverview/debug">Debug</a>
-    </div>
-    
-    <hr>
 
-    {{range .}}
-    <div class="section">
-        <details>
-            <summary>
-                <span class="heading">{{.Title}} ({{ if .ShowLearnedCount }}{{.LearnedCount}} / {{end}}{{ len .Cards }})</span>
-            </summary>
-            <div class="flow">
-                {{range .Cards}}
-                <div class="card">
-                    <div class="cardtop {{.Object}}-highlight">
-                        <a href="/card/{{.ID}}">
-                            {{if not .Characters}}
-                            <div style="background-color: red;">ERR</div>
-                            {{end}}
-                            <div class="cardjp">{{.Characters}}</div>
-                            <div>{{ (index .Meanings 0).Meaning }}</div>
-                        </a>
-                    </div>
-                    <div class="cardbar stage-{{.LearningStageString}}"></div>
+{{ define "content" }}
+<div class="links">
+    <a href="/cardoverview/bylearningstage">By Learning Stage</a>
+    |
+    <a href="/cardoverview/bylevel">By Level</a>
+    |
+    <a href="/cardoverview/bydue">By Due</a>
+    |
+    <a href="/cardoverview/bytype">By Type</a>
+    |
+    <a href="/cardoverview/bypartsofspeech">By Parts of Speech</a>
+    |
+    <a href="/cardoverview/byreviewperformance">By Review Performance</a>
+    |
+    <a href="/cardoverview/debug">Debug</a>
+</div>
+
+<hr>
+
+{{range .}}
+<div class="section">
+    <details>
+        <summary>
+            <span class="heading">{{.Title}} ({{ if .ShowLearnedCount }}{{.LearnedCount}} / {{end}}{{ len .Cards }})</span>
+        </summary>
+        <div class="flow">
+            {{range .Cards}}
+            <div class="card">
+                <div class="cardtop {{.Object}}-highlight">
+                    <a href="/card/{{.ID}}">
+                        {{if .CharacterImage}}
+                        <div class="character-image-container">
+                            <img class="character-image" src="/img/cards/{{.CharacterImage}}" />
+                        </div>
+                        {{else}}
+                        <div class="cardjp">{{.Characters}}</div>
+                        {{end}}
+                        <div>{{ (index .Meanings 0).Meaning }}</div>
+                    </a>
                 </div>
-                {{end}}
+                <div class="cardbar stage-{{.LearningStageString}}"></div>
             </div>
-        </details>
-    </div>
-    {{end}}
+            {{end}}
+        </div>
+    </details>
+</div>
+{{end}}
 {{ end }}

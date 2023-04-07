@@ -27,10 +27,7 @@ func SetupRoutes(cd *CardData) {
 	r.HandleFunc("/favicon.ico", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "static/img/icon.png")
 	})
-	r.HandleFunc("/img/{name}", func(w http.ResponseWriter, r *http.Request) {
-		vars := mux.Vars(r)
-		http.ServeFile(w, r, "static/img/" + vars["name"])
-	})
+	r.PathPrefix("/img/").Handler(http.FileServer(http.Dir(cd.StaticDir)))
 
 	r.HandleFunc("/card/{id}", cd.CardHandler)
 	r.HandleFunc("/card/{id}/json", cd.CardRawHandler)
@@ -417,6 +414,7 @@ func (cd *CardData) OverviewDebugHandler(w http.ResponseWriter, r *http.Request)
 	cl := cd.ToList()
 
 	cs := filterCardsByMissingCharacters(cl)
+	cs = filterCardsByMissingCharacterImage(cs)
 	cs = sortCardsById(cs)
 	o := NewCardOverviewData("Missing characters", cs, 0, false)
 	codl = append(codl, o)
