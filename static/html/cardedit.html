@@ -1,0 +1,132 @@
+{{ define "windowtitle" }}Edit: {{.CardDataTree.Card.ID}} - {{.CardDataTree.Card.Characters}}{{ end }}
+{{ define "title" }}
+<span class="id">{{.CardDataTree.Card.ID}} - </span>
+<span class="characters {{.CardDataTree.Card.Object}}-highlight">{{.CardDataTree.Card.Characters}}</span>
+{{if .CardDataTree.Card.Level}}<span class="level">Level {{.CardDataTree.Card.Level}}</span>{{end}}
+{{ end }}
+
+{{ define "content" }}
+<div class="links">
+    <a href="{{.CardDataTree.Card.DocumentURL}}">View on Wanikani</a>
+    |
+    <a href="https://jisho.org/search/{{.CardDataTree.Card.Characters}}">View on Jisho</a>
+    |
+    <a href="/card/{{.CardDataTree.Card.ID}}/json">View JSON</a>
+    |
+    <a href="/card/{{.CardDataTree.Card.ID}}/edit/save">Save</a>
+</div>
+
+<hr>
+
+<div class="section">
+    <span class="heading">Learning Stage:</span>
+    <select id="learningstage" name="learningstage">
+        {{ range $index, $element := .LearningStages }}
+        <option value="{{ $element.Value }}" {{if eq $element.Value $.CardDataTree.Card.LearningStage }}selected{{end}}>{{ $element.Text }} </option>
+        {{ end }}
+    </select>
+</div>
+
+<div class="section">
+    <span class="heading">Interval:</span>
+    <input id="interval" name="interval" type="number" size="3" class="input-interval" value="{{.CardDataTree.Card.Interval}}"> in hours
+</div>
+
+<div class="section">
+    <span class="heading">Next Review Date:</span>
+    <input id="nextreviewdate" name="nextreviewdate" type="date" class="input-nextreviewdate"
+        value="{{.CardDataTree.Card.NextReviewDate}}">
+</div>
+
+<hr>
+
+<div class="section">
+    <span class="heading">Parts of Speech</span>
+    {{ range $index, $element := .PartsOfSpeech }}
+    <input type="checkbox" id="partsofspeech{{$element.Text}}" name="partsofspeech{{$element.Text}}" value="{{$element.Text}}"
+        {{if $element.Selected}}checked{{end}}>
+    <label for="partsofspeech{{$element.Text}}">{{$element.Text}}</label>
+     | 
+    {{ end }}
+</div>
+
+<div class="section"><span class="heading">Meanings</span>
+    {{range $index, $element := .CardDataTree.Card.Meanings}}{{if $index}}, {{end}}{{$element.Meaning}}{{end}}
+</div>
+
+<div class="section">
+    <span class="heading">Meaning Mneumonic:</span>
+    <div class="meaningmneumonicdescription">{{.CardDataTree.MeaningMnemonicHtml}}</div>
+</div>
+
+{{if .CardDataTree.Card.Readings}}
+<div class="section"><span class="heading">Readings</span>
+    <div class="flow">
+        {{range $index, $element := .CardDataTree.Card.Readings}}
+        <div class="reading readingaccepted{{$element.AcceptedAnswer}}">
+            <div class="readingtype">{{$element.Type}}</div>
+            <div class="accepted{{$element.AcceptedAnswer}}">{{$element.Reading}}</div>
+        </div>
+        {{end}}
+    </div>
+</div>
+
+<div class="section">
+    <span class="heading">Reading Mneumonic</span>
+    <div class="readingmneumonicdescription">{{.CardDataTree.ReadingMnemonicHtml}}</div>
+</div>
+{{end}}
+
+<hr>
+
+<div class="section">
+    <span class="heading">Components</span>
+    <form action="/card/{{.CardDataTree.Card.ID}}/edit/save" method="post">
+        <input name="componentSubjectIds" value="{{.CardDataTree.Card.ComponentSubjectIDs}}">
+        <input type="submit" value="Save">
+    </form>
+    MAKE IT COMMA SEPARATED
+    <div class="flow">
+        {{range .CardDataTree.ComponentSubjects}}
+        <div class="card">
+            <div class="cardtop {{.Card.Object}}-highlight">
+                <a href="/card/{{.Card.ID}}">
+                    {{if not .Card.Characters}}
+                    <div style="background-color: red;">ERR</div>
+                    {{end}}
+                    <div class="cardjp">{{.Card.Characters}}</div>
+                    <div>{{ (index .Card.Meanings 0).Meaning }}</div>
+                </a>
+            </div>
+            <div class="cardbar stage-{{.Card.LearningStageString}}"></div>
+        </div>
+        {{end}}
+    </div>
+</div>
+
+{{if .CardDataTree.AmalgamationSubjectData}}
+<hr>
+
+<div class="section">
+    <div class="heading">
+        Found in:
+    </div>
+</div>
+<div class="flow">
+    {{range .CardDataTree.AmalgamationSubjectData}}
+    <div class="card">
+        <div class="cardtop {{.Object}}-highlight">
+            <a href="/card/{{.ID}}">
+                <div class="cardjp">{{.Characters}}</div>
+                <div>{{.Meaning}}</div>
+            </a>
+        </div>
+        <div class="cardbar stage-{{.LearningStageString}}"></div>
+    </div>
+    {{end}}
+</div>
+
+{{end}}
+{{end}}
+
+{{ template "templatemain.html" .}}

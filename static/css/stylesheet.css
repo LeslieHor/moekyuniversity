@@ -1,0 +1,297 @@
+html {
+    background-color: rgb(48, 48, 48);
+    color: rgb(255, 255, 255);
+    width: 80%;
+    margin: 0 auto;
+    font-family: sans-serif;
+}
+
+.flow {
+    display: flex;
+    flex-flow: row wrap;
+}
+
+li {
+    list-style-type: none;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+a {
+    color: rgb(146, 217, 253);;
+}
+
+.nav a {
+    text-decoration: none;
+    font-size: 0.8em;
+}
+
+.nav-right {
+    float: right;
+}
+
+.nav-right .search {
+    font-size: 0.5em;
+    ;
+}
+
+.footer {
+    margin: 0.5em 0;
+    font-size: 0.8em;
+    color: rgb(131, 131, 131);
+}
+
+.links {
+    text-decoration: none;
+    font-size: 0.8em;
+}
+
+.radical a {
+    text-decoration: none;
+    color: rgb(0, 136, 204);
+}
+
+.kanji a {
+    text-decoration: none;
+    color: rgb(204, 0, 136);
+}
+
+.vocabulary a {
+    text-decoration: none;
+    color: rgb(136, 0, 204);
+}
+
+.radical-highlight a {
+    text-decoration: none;
+    color: inherit;
+}
+
+.kanji-highlight a {
+    text-decoration: none;
+    color: inherit;
+}
+
+.vocabulary-highlight a {
+    text-decoration: none;
+    color: inherit;
+}
+
+.radical-highlight {
+    background-color: rgb(0, 136, 204);
+}
+
+.kanji-highlight {
+    background-color: rgb(204, 0, 136);
+}
+
+.vocabulary-highlight {
+    background-color: rgb(136, 0, 204);
+}
+
+.inline-highlight {
+    padding: 0.0em 0.3em 0.3em 0.3em;
+    display: inline-block;
+    color: white;
+    border-radius: 0.2em;
+}
+
+.title {
+    font-size: 2.5em;
+}
+
+.title .id {
+    color: rgb(131, 131, 131);
+}
+
+.title .characters {
+    padding: 0.0em 0.2em;
+    border-radius: 0.3em;
+}
+
+.title .level {
+    color: rgb(131, 131, 131);
+    font-size: 1.0em;
+}
+
+.section {
+    margin: 0.5em 0;
+}
+
+.heading {
+    font-weight: 900;
+}
+
+.partsofspeech {
+    margin: 0.2em 0.2em;
+    padding: 0.2em;
+    border-radius: 0.5em;
+    background-color: rgb(75, 75, 75);
+}
+
+.reading {
+    margin: 0.5em 0.5em;
+    padding: 0.5em;
+    border-radius: 0.5em;
+}
+
+.readingacceptedtrue {
+    background-color: rgb(75, 75, 75);
+}
+
+.readingacceptedfalse {
+    background-color: rgb(54, 54, 54);
+    color: rgb(146, 146, 146);
+}
+
+.card {
+    width: 150px;
+    margin: 0.5em 0.5em;
+}
+
+.cardtop {
+    min-height: 100px;
+    text-align: center;
+    border-radius: 0.5em 0.5em 0 0;
+    padding: 0.2em 0.3em;
+    display: inline-block;
+    color: white;
+    width: inherit;
+}
+
+.knownbar {
+    background-color: green;
+    border-radius: 0 0 0.5em 0.5em;
+    height: 0.5em;
+    padding: 0.2em 0.3em;
+    width: inherit;
+}
+
+.cardjp {
+    font-size: 2em;
+}
+
+.cardbar {
+    border-radius: 0 0 0.5em 0.5em;
+    height: 0.5em;
+    padding: 0.2em 0.3em;
+    width: inherit;
+    background-color: rgb(116, 204, 0);
+}
+
+.stage-Unavailable {
+    background-color: rgb(255, 0, 0);
+}
+
+.stage-Available {
+    background-color: rgb(204, 0, 255);
+}
+
+.stage-Learning {
+    background-color: rgb(255, 217, 0);
+}
+
+.stage-Learned {
+    background-color: rgb(0, 238, 255);
+}
+
+.stage-Burned {
+    background-color: rgb(0, 255, 0);
+}
+
+.cardtop .meaning {
+    color: green;
+    vertical-align: bottom;
+}
+
+.tooltip {
+    visibility: hidden;
+}
+
+.tooltip:hover {
+    visibility: visible;
+    width: 120px;
+    background-color: black;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px 0;
+
+    /* Position the tooltip */
+    position: absolute;
+    z-index: 1;
+}
+
+.input-interval {
+    size: 10px;
+}
+
+.srs-object-type {
+    font-size: 1.0em;
+    text-align: center;
+    background-color: rgb(88, 88, 88);
+}
+.srs-jp {
+    font-size: 10em;
+    text-align: center;
+}
+
+.srs-answer-parent {
+    display: flex;
+    flex-flow: row wrap;
+    width: 100%;
+    justify-content: center;
+}
+.srs-answer-section {
+    margin: 0.5em 0.5em;
+    background-color: rgb(78, 78, 78);
+    width: 40%;
+    min-height: 100px;
+}
+.srs-heading {
+    font-size: 1.0em;
+    text-align: center;
+    background-color: rgb(88, 88, 88);
+}
+.srs-answer {
+    padding: 0.5em;
+}
+.srs-hidden {
+    display: none;
+}
+.srs-reading {
+    font-size: 1.5em;
+}
+
+.srs-submit {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+}
+.srs-submit-button{
+    margin: 0.5em 0.5em;
+    width: 300px;
+    height: 100px;
+    font-size: 3.0em;
+    border-radius: 0.5em;
+    /* align text in the middle of the button */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+}
+.srs-correct {
+    background-color: rgb(47, 179, 47);
+}
+.srs-incorrect {
+    background-color: rgb(194, 55, 55);
+}
+
+.srs-submit-hidden {
+    display: none;
+}
+.srs-not-accepted {
+    color: rgb(112, 111, 111);
+}

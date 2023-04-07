@@ -1,0 +1,157 @@
+{{ define "windowtitle" }}{{.Card.ID}} - {{.Card.Characters}}{{ end }}
+{{ define "title" }}
+<span class="id">{{.Card.ID}} - </span>
+<span class="characters {{.Card.Object}}-highlight">{{.Card.Characters}}</span>
+{{if .Card.Level}}<span class="level">Level {{.Card.Level}}</span>{{end}}
+{{ end }}
+
+<!-- Define a template to recursivly display the component tree -->
+{{define "node"}}
+<li>
+    <div class="card">
+        <div class="cardtop {{.Card.Object}}-highlight">
+            <a href="{{.Card.ID}}">
+                {{if not .Card.Characters}}
+                <div style="background-color: red;">ERR</div>
+                {{end}}
+                <div class="cardjp">{{.Card.Characters}}</div>
+                <div>{{ (index .Card.Meanings 0).Meaning }}</div>
+            </a>
+        </div>
+        <div class="cardbar stage-{{.Card.LearningStageString}}"></div>
+    </div>
+</li>
+<ul>
+    {{range .ComponentSubjects}}
+    {{template "node" .}}
+    {{end}}
+</ul>
+{{end}}
+
+{{ define "content" }}
+<div class="links">
+    <a href="{{.Card.DocumentURL}}">View on Wanikani</a>
+    |
+    <a href="https://jisho.org/search/{{.Card.Characters}}">View on Jisho</a>
+    |
+    <a href="/card/{{.Card.ID}}/json">View JSON</a>
+    |
+    <a href="/card/{{.Card.ID}}/edit">Edit</a>
+</div>
+
+<hr>
+
+<div class="section">
+    <span class="heading">Learning Stage:</span>
+    {{ if .Card.LearningStageString }}
+    <span class="learning-stage {{.Card.LearningStageString}}">{{.Card.LearningStageString}}</span>
+    {{ else }}
+    <span style="background-color: red;">ERROR</span>
+    {{end}}
+</div>
+
+{{ if .Card.Interval }}
+<div class="section">
+    <span class="heading">Interval:</span>
+    <span class="interval">{{.Card.Interval}}</span>
+</div>
+{{end}}
+
+{{ if .Card.LearningInterval }}
+<div class="section">
+    <span class="heading">Learning Interval:</span>
+    <span class="interval">{{.Card.LearningInterval}}</span>
+</div>
+{{end}}
+
+{{ if .Card.NextReviewDate }}
+<div class="section">
+    <span class="heading">Next Review Date:</span>
+    <span class="nextreviewdate">{{.Card.NextReviewDate}}</span>
+</div>
+{{end}}
+
+<hr>
+
+{{if .Card.PartsOfSpeech}}
+<div class="section">
+    <span class="heading">Parts of Speech</span>
+    <div class="flow">
+        {{range $index, $element := .Card.PartsOfSpeech}}
+        <div class="partsofspeech">
+            {{$element}}
+        </div>
+        {{end}}
+    </div>
+</div>
+{{end}}
+
+<div class="section"><span class="heading">Meanings</span>
+    {{range $index, $element := .Card.Meanings}}{{if $index}}, {{end}}{{$element.Meaning}}{{end}}
+</div>
+
+<div class="section">
+    <span class="heading">Meaning Mneumonic:</span>
+    <div class="meaningmneumonicdescription">{{.MeaningMnemonicHtml}}</div>
+</div>
+
+{{if .Card.Readings}}
+<div class="section"><span class="heading">Readings</span>
+    <div class="flow">
+        {{range $index, $element := .Card.Readings}}
+        <div class="reading readingaccepted{{$element.AcceptedAnswer}}">
+            <div class="readingtype">{{$element.Type}}</div>
+            <div class="accepted{{$element.AcceptedAnswer}}">{{$element.Reading}}</div>
+        </div>
+        {{end}}
+    </div>
+</div>
+
+<div class="section">
+    <span class="heading">Reading Mneumonic</span>
+    <div class="readingmneumonicdescription">{{.ReadingMnemonicHtml}}</div>
+</div>
+{{end}}
+
+<hr>
+
+<div class="section">
+    <details open>
+        <summary>
+            <span class="heading">Component Tree</span>
+        </summary>
+
+        <div class="componenttree">
+            <ul>
+                {{template "node" .}}
+            </ul>
+        </div>
+    </details>
+</div>
+
+{{if .AmalgamationSubjectData}}
+<hr>
+
+<div class="section">
+    <div class="heading">
+        Found in:
+    </div>
+</div>
+<div class="flow">
+    {{range .AmalgamationSubjectData}}
+    <div class="card">
+        <div class="cardtop {{.Object}}-highlight">
+            <a href="{{.ID}}">
+                <div class="cardjp">{{.Characters}}</div>
+                <div>{{.Meaning}}</div>
+            </a>
+        </div>
+        <div class="cardbar stage-{{.LearningStageString}}"></div>
+    </div>
+    {{end}}
+</div>
+
+{{end}}
+{{end}}
+
+{{ template "templatemain.html" .}}

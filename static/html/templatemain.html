@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<head>
+    <title>{{ block "windowtitle" .}}{{ end }}</title>
+    <link rel="stylesheet" href="/stylesheet.css">
+    <script>
+        window.onload = function () {
+            var urlParams = new URLSearchParams(window.location.search);
+            var searchTerm = urlParams.get("q");
+            // Set the search term in the search bar
+            document.getElementById("searchterm").value = searchTerm;
+
+            // When the user presses enter in the search bar, search
+            document.getElementById("searchterm").onkeypress = function (event) {
+                if (!event) event = window.event;
+                if (event.keyCode == 13) {
+                    search();
+                }
+            };
+        }
+
+        function search() {
+            // Redirect the user to the search page with the search term
+            // inserted to the URL
+            var searchTerm = document.getElementById("searchterm").value;
+            window.location.href = "/search?q=" + searchTerm;
+        }
+    </script>
+</head>
+
+<body>
+    <div class="title">
+        {{ block "title" .}}{{ end }}
+    </div>
+
+    <!-- Navigation bar with links on left and search on right -->
+    <div class="nav">
+        <a href="/">Home</a>
+        |
+        <a href="/cardoverview">Card Overview</a>
+        |
+        <a href="/srs">SRS</a>
+
+        <!-- Search bar on right side -->
+        <div class="nav-right">
+            <div class="search">
+                <input type="text" id="searchterm" value="">
+                <button id="searchbutton" onclick="search()">Search</button>
+            </div>
+        </div>
+    </div>
+    <hr>
+
+    {{ block "content" . }}{{ end }}
+
+    <hr>
+    <div class="footer">
+        Nya nya moe moe kyuun!
+    </div>
+</body>

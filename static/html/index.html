@@ -1,0 +1,32 @@
+{{ define "windowtitle" }}Moe Kyuniversity{{ end }}
+{{ define "title" }}Moe Kyuniversity{{ end }}
+
+{{ define "content" }}
+<div class="section">
+    <br>
+    <div>
+        <img src="/img/icon.png" style="width: 100px; height: 100px; margin: 0 auto; display: block;">
+    </div>
+    <br>
+    <div>
+        Moe Kyuniversity is an SRS tool for learning Japanese. It takes inspiration from Anki, and uses the precious
+        Wanikani
+        data to create a custom SRS system.
+    </div>
+    <br>
+    <div>
+        Search for a vocabulary word you want to learn, and Moe Kyuniversity uses the Wanikani data to figure out what
+        kanji
+        and radicals you need to learn before you can learn the vocabulary. Now you are not confined to the word
+        learning order that Wanikani have chosen.
+    </div>
+
+    <br>
+
+    <div>
+        Card that has a custom dependency that is not coded in the wanikani data: <a href="/card/6097">弾</a>.
+    </div>
+</div>
+{{ end }}
+
+{{ template "templatemain.html" .}}

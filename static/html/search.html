@@ -1,0 +1,23 @@
+{{ define "windowtitle" }}Search - {{.SearchTerm}}{{ end }}
+{{ define "title" }}Search - {{.SearchTerm}}{{ end }}
+
+{{ define "content" }}
+    <div class="flow">
+        {{range .SearchResults}}
+        <div class="card">
+            <div class="cardtop {{.Object}}-highlight">
+                <a href="/card/{{.ID}}">
+                    {{if not .Characters}}
+                    <div style="background-color: red;">ERR</div>
+                    {{end}}
+                    <div class="cardjp">{{.Characters}}</div>
+                    <div>{{ (index .Meanings 0).Meaning }}</div>
+                </a>
+            </div>
+            <div class="cardbar stage-{{.LearningStageString}}"></div>
+        </div>
+        {{end}}
+    </div>
+{{ end }}
+
+{{ template "templatemain.html" .}}
