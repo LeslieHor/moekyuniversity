@@ -37,6 +37,7 @@ func SetupRoutes(cd *CardData) {
 		http.ServeFile(w, r, filepath.Join(cd.DataDir, r.URL.Path[6:]))
 	})
 
+	r.HandleFunc("/card/new", cd.CardNewHandler)
 	r.HandleFunc("/card/{id}", cd.CardHandler)
 	r.HandleFunc("/card/{id}/raw", cd.CardRawHandler)
 	r.HandleFunc("/card/{id}/json", cd.CardJsonHandler)
@@ -279,6 +280,38 @@ func (cd *CardData) CardCharacterImageUploadHandler(w http.ResponseWriter, r *ht
 
 	// Send an ok response
 	w.WriteHeader(http.StatusOK)
+}
+
+func (cd *CardData) CardNewHandler(w http.ResponseWriter, r *http.Request) {
+	m := Meaning{
+		Meaning: "Placeholder meaning",
+		Primary: true,
+		AcceptedAnswer: true,
+	}
+	r1 := Reading{
+		Reading: "Placeholder reading",
+		Type: "onyomi",
+		Primary: true,
+		AcceptedAnswer: true,
+	}
+	r2 := Reading{
+		Reading: "Placeholder reading",
+		Type: "kunyomi",
+		Primary: false,
+		AcceptedAnswer: false,
+	}
+
+	c := Card{
+		ID: cd.GetNewCardId(),
+		Meanings: []Meaning{m},
+		Readings: []Reading{r1, r2},
+	}
+
+	cd.Cards[c.ID] = &c
+	cd.UpdateCardData()
+	cd.SaveCardMap()
+
+	http.Redirect(w, r, fmt.Sprintf("/card/%d", c.ID), http.StatusFound)
 }
 
 type CardOverviewData struct {

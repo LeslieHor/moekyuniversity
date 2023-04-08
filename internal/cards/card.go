@@ -22,6 +22,19 @@ var LearningStages = []LearningStage{
 	Burned,
 }
 
+type Meaning struct {
+	Meaning        string `json:"meaning"`
+	Primary        bool   `json:"primary"`
+	AcceptedAnswer bool   `json:"accepted_answer"`
+}
+
+type Reading struct {
+	Reading        string `json:"reading"`
+	Type           string `json:"type"`
+	Primary        bool   `json:"primary"`
+	AcceptedAnswer bool   `json:"accepted_answer"`
+}
+
 type Card struct {
 	ID             int    `json:"id"`
 	Object         string `json:"object"`
@@ -30,17 +43,8 @@ type Card struct {
 	Characters     string `json:"characters"`
 	CharacterImage string `json:"character_image"`
 	CharacterAlt   string `json:"character_alt"`
-	Meanings       []struct {
-		Meaning        string `json:"meaning"`
-		Primary        bool   `json:"primary"`
-		AcceptedAnswer bool   `json:"accepted_answer"`
-	} `json:"meanings"`
-	Readings []struct {
-		Reading        string `json:"reading"`
-		Type           string `json:"type"`
-		Primary        bool   `json:"primary"`
-		AcceptedAnswer bool   `json:"accepted_answer"`
-	} `json:"readings"`
+	Meanings       []Meaning `json:"meanings"`
+	Readings       []Reading `json:"readings"`
 	PartsOfSpeech          []string `json:"parts_of_speech"`
 	ComponentSubjectIDs    []int    `json:"component_subject_ids"`
 	AmalgamationSubjectIDs []int    `json:"amalgamation_subject_ids"`

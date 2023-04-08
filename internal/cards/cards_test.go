@@ -18,11 +18,7 @@ func checkSearchResults(t *testing.T, results []*Card, expectedIds []int) {
 func createCardWithMeaning(id int, characters string, meaning string) *Card {
 	return &Card{ID: id,
 				 Characters: characters,
-				 Meanings: []struct {
-					Meaning string `json:"meaning"`
-					Primary bool `json:"primary"`
-					AcceptedAnswer bool `json:"accepted_answer"`
-				}{
+				 Meanings: []Meaning {
 					{meaning, true, true},
 				}}
 }

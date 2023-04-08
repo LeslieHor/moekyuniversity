@@ -325,6 +325,23 @@ func (cd *CardData) GetAllPartsOfSpeech(id int) []PartOfSpeech {
 	return returnData
 }
 
+func (cd *CardData) GetNewCardId() int {
+	// Get the highest ID
+	var highestId int
+	for _, card := range cd.Cards {
+		if card.ID > highestId {
+			highestId = card.ID
+		}
+	}
+
+	// Set a minimum ID of 100000 to avoid conflicts with existing cards
+	if highestId < 100000 {
+		highestId = 100000
+	}
+
+	return highestId + 1
+}
+
 func containsString(s []string, e string) bool {
     for _, a := range s {
         if a == e {

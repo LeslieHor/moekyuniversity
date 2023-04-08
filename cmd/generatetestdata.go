@@ -59,11 +59,7 @@ func main() {
 				ID: i,
 				Object: t,
 				Characters: k,
-				Meanings: []struct {
-				   Meaning string `json:"meaning"`
-				   Primary bool `json:"primary"`
-				   AcceptedAnswer bool `json:"accepted_answer"`
-			   }{
+				Meanings: []cards.Meaning {
 				   {"one", true, true},
 				   {"two", false, false},
 				   {"three", false, false},
@@ -121,11 +117,7 @@ func main() {
 		ID: i,
 		Object: "radical",
 		Characters: "",
-		Meanings: []struct {
-		   Meaning string `json:"meaning"`
-		   Primary bool `json:"primary"`
-		   AcceptedAnswer bool `json:"accepted_answer"`
-	   }{
+		Meanings: []cards.Meaning {
 		   {"Stick", true, true},
 		   {"two", false, false},
 		   {"three", false, false},
@@ -138,11 +130,7 @@ func main() {
 		ID: i,
 		Object: "radical",
 		Characters: "令",
-		Meanings: []struct {
-			Meaning string `json:"meaning"`
-			Primary bool `json:"primary"`
-			AcceptedAnswer bool `json:"accepted_answer"`
-		}{
+		Meanings: []cards.Meaning {
 			{"Orders", true, true},
 			{"two", false, false},
 		},
