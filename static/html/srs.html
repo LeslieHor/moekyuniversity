@@ -1,0 +1,154 @@
+{{ define "windowtitle" }}SRS - ({{.LearningCount}}) {{.DueCount}} remaining{{ end }}
+{{ define "title" }}SRS - ({{.LearningCount}}) {{.DueCount}} remaining{{ end }}
+
+{{ define "content" }}
+
+{{ if .Card }}
+
+<div class="links">
+    <a href="/card/{{.Card.ID}}" target="_blank">View Card</a>
+</div>
+
+<hr>
+
+<br>
+
+<div class="srs-card">
+    <div class="srs-object-type">{{ .Card.Object }}</div>
+    <div class="{{ .Card.Object }}-highlight srs-jp">{{ .Card.Characters }}</div>
+</div>
+
+<br>
+
+<div class="srs-answer-parent">
+    <div class="srs-answer-section" onclick="toggleAnswerMeaning()">
+        <div class="srs-heading">Meaning</div>
+        <div class="srs-answer srs-hidden answer-meaning">
+            {{ range .Card.Meanings }}
+            <div class="srs-meaning">{{ .Meaning }}</div>
+            {{ end }}
+        </div>
+    </div>
+
+    <div class="srs-answer-section" onclick="toggleAnswerReading()">
+        <div class="srs-heading">Reading</div>
+        <div class="srs-answer srs-hidden answer-reading">
+            {{ if .Card.Readings }}
+            {{ range .Card.Readings }}
+            <div class="srs-reading {{if not .AcceptedAnswer}}srs-not-accepted{{end}}">{{ if .Type}}{{.Type}}: {{end}}{{ .Reading }}</div>
+            {{ end }}
+            {{ else }}
+            <div class="srs-reading">No Readings</div>
+            {{ end }}
+        </div>
+    </div>
+
+    <div class="srs-answer-section" onclick="toggleAnswerMeaning()">
+        <div class="srs-heading">Meaning Mneumonic</div>
+        <div class="srs-answer srs-hidden answer-meaning">
+            <div class="srs-meaning-mnemonic">{{ .MeaningMnemonicHtml }}</div>
+        </div>
+    </div>
+
+    <div class="srs-answer-section" onclick="toggleAnswerReading()">
+        <div class="srs-heading">Reading Mneumonic</div>
+        <div class="srs-answer srs-hidden answer-reading">
+            {{ if .ReadingMnemonicHtml }}
+            <div class="srs-reading-mnemonic">{{ .ReadingMnemonicHtml }}</div>
+            {{ else }}
+            <div class="srs-reading-mnemonic">No Reading Mneumonic</div>
+            {{ end }}
+        </div>
+    </div>
+
+    <div class="srs-answer-section" onclick="toggleAnswerInformation()">
+        <div class="srs-heading">Information</div>
+        <div class="srs-answer srs-hidden answer-information">
+            <div class="srs-information">Current Interval: {{ .Card.Interval }}</div>
+            <div class="srs-information">Learning Interval: {{ .Card.LearningInterval }}</div>
+        </div>
+    </div>
+</div>
+
+<div class="srs-submit srs-submit-hidden">
+    <div class="srs-submit-button srs-incorrect" onclick="window.location.href='/srs/incorrect/{{ .Card.ID }}'">
+        Incorrect</div>
+    <div class="srs-submit-button srs-correct" onclick="window.location.href='/srs/correct/{{ .Card.ID }}'">Correct
+    </div>
+</div>
+
+<script>
+    // When the user clicks on the answer section,
+    // toggle between hiding and showing the answers
+    // When both meaning and reading are hidden, show the submit buttons
+    var meaningShown = false;
+    var readingShown = false;
+
+    function toggleAnswer(className) {
+        var x = document.getElementsByClassName(className);
+        var i;
+        for (i = 0; i < x.length; i++) {
+            if (x[i].classList.contains("srs-hidden")) {
+                x[i].classList.remove("srs-hidden");
+                if (className == "answer-meaning") {
+                    meaningShown = true;
+                } else if (className == "answer-reading") {
+                    readingShown = true;
+                }
+            } else {
+                x[i].classList.add("srs-hidden");
+                if (className == "answer-meaning") {
+                    meaningShown = false;
+                } else if (className == "answer-reading") {
+                    readingShown = false;
+                }
+            }
+        }
+
+        if (meaningShown && readingShown) {
+            showSubmit("srs-submit");
+        } else {
+            hideSubmit("srs-submit");
+        }
+    }
+
+    function showSubmit(className) {
+        var x = document.getElementsByClassName(className);
+        var i;
+        for (i = 0; i < x.length; i++) {
+            x[i].classList.remove("srs-submit-hidden");
+        }
+    }
+
+    function hideSubmit(className) {
+        var x = document.getElementsByClassName(className);
+        var i;
+        for (i = 0; i < x.length; i++) {
+            x[i].classList.add("srs-submit-hidden");
+        }
+    }
+
+    function toggleAnswerReading() {
+        toggleAnswer("answer-reading");
+    }
+
+    function toggleAnswerMeaning() {
+        toggleAnswer("answer-meaning");
+    }
+
+    function toggleAnswerInformation() {
+        toggleAnswer("answer-information");
+    }
+</script>
+
+{{ else }}
+
+<div class="banner">
+Congratulations! You have no cards due!
+</div>
+
+{{ end }}
+
+{{ end }}
+
+{{ template "templatemain.html" .}}

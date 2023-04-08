@@ -119,6 +119,10 @@ func LearningStageToString(ls LearningStage) string {
 	}
 }
 
+func (c *Card) GetLearningStage() LearningStage {
+	return c.LearningStage
+}
+
 func (c *Card) GetLearningStageString() string {
 	return LearningStageToString(c.LearningStage)
 }

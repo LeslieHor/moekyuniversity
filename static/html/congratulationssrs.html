@@ -1,0 +1,30 @@
+{{ define "windowtitle" }}SRS - ({{.LearningCount}}) {{.DueCount}} remaining{{ end }}
+{{ define "title" }}SRS - ({{.LearningCount}}) {{.DueCount}} remaining{{ end }}
+
+{{ define "content" }}
+
+<div class="links">
+    <a href="/card/{{.Card.ID}}" target="_blank">View Card</a>
+</div>
+
+<hr>
+
+<div class="section">
+    <div class="srs-congratulations">
+        Congratulations!<br>
+        <br>
+        <span class="congratulations-character inline-highlight {{.Card.Object}}-highlight">{{.Card.Characters}}</span>
+        <br><br>
+        is now in the<br><br>
+        <span class="congratulations-learning-stage stage-{{.Card.LearningStageString}}">{{.Card.LearningStageString}}</span><br><br>
+        stage.
+    </div>
+    <br><br>
+    <div class="return-to-srs">
+        <a href="/srs">Return to SRS</a>
+    </div>
+</div>
+
+{{ end }}
+
+{{ template "templatemain.html" .}}
