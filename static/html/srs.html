@@ -13,6 +13,14 @@
 
 <br>
 
+{{ if eq .Card.LearningStageString "Up Next" }}
+<div class="srs-upnext">
+    <div class="srs-upnext-heading">Up Next</div>
+    <div class="srs-upnext-text">This card on your Up Next List.</div>
+</div>
+<br><br>
+{{ end }}
+
 <div class="srs-card">
     <div class="srs-object-type">{{ .Card.Object }}</div>
     <div class="{{ .Card.Object }}-highlight srs-jp">{{ .Card.Characters }}</div>

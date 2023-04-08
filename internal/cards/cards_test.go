@@ -59,6 +59,7 @@ func TestDelete(t *testing.T) {
 	c5 := createCardWithMeaning(5, "三", "Three")
 	c6 := createCardWithMeaning(6, "三つ", "Three things")
 	cd := CreateCardDataFromSlice([]*Card{c1, c2, c3, c4, c5, c6})
+	cd.BackupDir = "/tmp/moekyuniversity_test" // Crappy hacky to make tests work
 
 	// Delete card 1
 	cd.DeleteCard(1)

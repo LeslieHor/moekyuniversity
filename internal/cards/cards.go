@@ -8,6 +8,7 @@ import (
 	"sort"
 	"time"
 	"path/filepath"
+	"os"
 )
 
 type CardData struct {
@@ -64,6 +65,15 @@ func (cd *CardData) UpdateCardData() {
 }
 
 func (cd *CardData) BackupCardMap() {
+	// If the backup directory doesn't exist, create it
+	if _, err := os.Stat(cd.BackupDir); os.IsNotExist(err) {
+		log.Printf("Creating backup directory %s", cd.BackupDir)
+		err := os.Mkdir(cd.BackupDir, 0755)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+
 	t := time.Now()
 	backupFilename := filepath.Join(cd.BackupDir, "cards-" + t.Format(time.RFC3339) + ".json")
 	log.Printf("Backing up cards to %s", backupFilename)
@@ -218,6 +228,16 @@ func filterCardsByReviewPerformance(cardData []*Card, lowerBound float64, upperB
 		// Calculate review performance
 		performance := card.GetReviewPerformance()
 		if performance >= lowerBound && performance <= upperBound {
+			cards = append(cards, card)
+		}
+	}
+	return cards
+}
+
+func filterOutCardsByLearningStage(cardData []*Card, learningStage LearningStage) []*Card {
+	var cards []*Card
+	for _, card := range cardData {
+		if card.LearningStage != learningStage {
 			cards = append(cards, card)
 		}
 	}

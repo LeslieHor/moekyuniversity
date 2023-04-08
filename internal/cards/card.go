@@ -1,6 +1,8 @@
 package cards
 
-import ()
+import (
+	"time"
+)
 
 type LearningStage int
 
@@ -149,4 +151,14 @@ func (c *Card) IncrementReviewCount() {
 
 func (c *Card) IncrementCorrectAnswerCount() {
 	c.TotalTimesCorrect++
+}
+
+func (c *Card) SetToUpNext() {
+	// Check that the card is the in the Available stage
+	if c.LearningStage != Available {
+		return
+	}
+
+	// Set NextReviewDate to 1970-01-01T00:00:00Z
+	c.NextReviewDate = time.Unix(0, 0).Format(time.RFC3339)
 }

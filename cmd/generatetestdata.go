@@ -8,6 +8,7 @@ import (
 
 var (
 	cardsFile = flag.String("cards-file", "data/cards.json", "Cards file")
+	backupDir = flag.String("backup-dir", "data/backup", "Backup directory")
 )
 
 var Kanji []string = []string{
@@ -35,12 +36,12 @@ func setLearning(c *cards.Card) {
 func setUpNext(c *cards.Card) {
 	c.Interval = 0
 	c.LearningInterval = 0
-	c.NextReviewDate = time.Now().Format(time.RFC3339)
+	c.NextReviewDate = "1970-01-01T00:00:00Z"
 }
 
 func main() {
 	flag.Parse()
-	cardData := cards.CardData{CardsFile: *cardsFile}
+	cardData := cards.CardData{CardsFile: *cardsFile, BackupDir: *backupDir}
 
 	cs := make(map[int]*cards.Card)
 	var i int
