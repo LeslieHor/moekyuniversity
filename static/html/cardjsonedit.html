@@ -4,7 +4,7 @@ Editing:
 <span class="id">{{.CardDataTree.Card.ID}} - </span>
 <span class="characters {{.CardDataTree.Card.Object}}-highlight">{{if .CardDataTree.Card.CharacterImage}}<img
         class="title-character-image"
-        src="/img/cards/{{.CardDataTree.Card.CharacterImage}}" />{{else}}{{.CardDataTree.Card.Characters}}{{end}}</span>
+        src="/data/img/{{.CardDataTree.Card.CharacterImage}}" />{{else}}{{.CardDataTree.Card.Characters}}{{end}}</span>
 {{if .CardDataTree.Card.Level}}<span class="level">Level {{.CardDataTree.Card.Level}}</span>{{end}}
 {{ end }}
 {{ define "head" }}
@@ -21,12 +21,29 @@ Editing:
     |
     <a href="https://jisho.org/search/{{.CardDataTree.Card.Characters}}">View on Jisho</a>
     |
+    <a href="/card/{{.CardDataTree.Card.ID}}/json">View JSON</a>
+    |
+    <a href="/card/{{.CardDataTree.Card.ID}}">Back</a>
+    |
     <a onClick="saveJson()">Save</a>
 </div>
 
 <hr>
 
-<div id="jsoneditor"></div>
+<div class="section">
+    <div class="heading">Character Image</div>
+    <div>Upload a character image (pngs only)</div>
+    <div>This will reload the json and lose any changes you have manually made.</div>
+    <input type="file" id="file" name="file" />
+    <a onClick="uploadCharacterImage()">Upload</a>
+</div>
+
+<hr>
+
+<div class="section">
+    <div class="heading">JSON</div>
+    <div id="jsoneditor"></div>
+</div>
 
 <script>
     function loadJson() {
@@ -56,6 +73,25 @@ Editing:
             }
         })
     }
+
+    // Upload character image to the server
+    function uploadCharacterImage() {
+        const file = document.getElementById("file").files[0]
+        const formData = new FormData()
+        formData.append("file", file)
+        fetch("/card/{{.CardDataTree.Card.ID}}/edit/characterimageupload", {
+            method: 'POST',
+            body: formData
+        }).then(response => {
+            if (response.ok) {
+                // Reload the page
+                window.location.href = "/card/{{.CardDataTree.Card.ID}}/edit"
+            } else {
+                alert("Error uploading!")
+            }
+        })
+    }
+
     // create the editor
     const container = document.getElementById("jsoneditor")
     const options = {

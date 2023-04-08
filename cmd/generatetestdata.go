@@ -121,8 +121,6 @@ func main() {
 		ID: i,
 		Object: "radical",
 		Characters: "",
-		CharacterImage: "radical_stick.png",
-		CharacterAlt: "Stick",
 		Meanings: []struct {
 		   Meaning string `json:"meaning"`
 		   Primary bool `json:"primary"`
