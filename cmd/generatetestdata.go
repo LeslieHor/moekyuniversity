@@ -134,6 +134,22 @@ func main() {
 	   },
 	}
 
+	// A card with a character that is different for Japanese vs Chinese
+	i++
+	cs[i] = &cards.Card{
+		ID: i,
+		Object: "radical",
+		Characters: "令",
+		Meanings: []struct {
+			Meaning string `json:"meaning"`
+			Primary bool `json:"primary"`
+			AcceptedAnswer bool `json:"accepted_answer"`
+		}{
+			{"Orders", true, true},
+			{"two", false, false},
+		},
+	}
+
 	cardData.Cards = cs
 	cardData.SaveCardMap()
 }
