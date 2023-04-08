@@ -496,10 +496,30 @@ func (cd *CardData) SrsCorrectHandler(w http.ResponseWriter, r *http.Request) {
 
 	log.Printf("Correct answer for card %d", cardId)
 	c := cd.GetCard(cardId)
+	prevState := c.GetLearningStageString()
+
 	c.CorrectAnswer()
 
 	cd.UpdateCardData()
 	cd.SaveCardMap()
+
+	currentState := c.GetLearningStageString()
+	if currentState != prevState {
+		log.Printf("Card %d changed from %s to %s", cardId, prevState, currentState)
+		s := cd.GetNextSrsCard()
+		pageData := struct {
+			Card *Card
+			DueCount int
+			LearningCount int
+		}{
+			Card: c,
+			DueCount: s.DueCount,
+			LearningCount: s.LearningCount,
+		}
+
+		cd.doTemplate(w, r, "congratulationssrs.html", pageData)
+		return
+	}
 	
 	http.Redirect(w, r, "/srs", http.StatusFound)
 }
