@@ -9,12 +9,16 @@ import (
 	"log"
 	"path/filepath"
 	"io/ioutil"
+	"os"
+	"fmt"
 
 	"github.com/gorilla/mux"
 )
 
 func SetupRoutes(cd *CardData) {
 	cd.SetupFuncMap()
+
+	log.Printf("Data dir: %s", cd.DataDir)
 	
 	r := mux.NewRouter()
 
@@ -27,12 +31,18 @@ func SetupRoutes(cd *CardData) {
 		http.ServeFile(w, r, "static/img/icon.png")
 	})
 	r.PathPrefix("/img/").Handler(http.FileServer(http.Dir(cd.StaticDir)))
+	
+	// Strip the /data prefix from the path and serve the file from the data directory
+	r.PathPrefix("/data/").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, filepath.Join(cd.DataDir, r.URL.Path[6:]))
+	})
 
 	r.HandleFunc("/card/{id}", cd.CardHandler)
 	r.HandleFunc("/card/{id}/raw", cd.CardRawHandler)
 	r.HandleFunc("/card/{id}/json", cd.CardJsonHandler)
 	r.HandleFunc("/card/{id}/edit", cd.CardJsonEditHandler)
 	r.HandleFunc("/card/{id}/edit/save", cd.CardJsonEditSaveHandler)
+	r.HandleFunc("/card/{id}/edit/characterimageupload", cd.CardCharacterImageUploadHandler)
 
 	r.HandleFunc("/cardoverview", cd.OverviewByLearningStageHandler)
 	r.HandleFunc("/cardoverview/bylearningstage", cd.OverviewByLearningStageHandler)
@@ -217,6 +227,53 @@ func (cd *CardData) CardJsonEditSaveHandler(w http.ResponseWriter, r *http.Reque
 
 	// Save the card
 	cd.Cards[id] = &c
+	cd.UpdateCardData()
+	cd.SaveCardMap()
+
+	// Send an ok response
+	w.WriteHeader(http.StatusOK)
+}
+
+func (cd *CardData) CardCharacterImageUploadHandler(w http.ResponseWriter, r *http.Request) {
+	// Get card ID from URL
+	vars := mux.Vars(r)
+	id, err := strconv.Atoi(vars["id"])
+	if err != nil {
+		panic(err)
+	}
+	log.Printf("Uploading image for card %d", id)
+
+	// Get the image data from the POST request
+	imageData, _, err := r.FormFile("file")
+	if err != nil {
+		log.Printf("Error getting image data: %s", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	// Extract the image data
+	imageDataBytes, err := ioutil.ReadAll(imageData)
+	if err != nil {
+		log.Printf("Error reading image data: %s", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	c := cd.GetCard(id)
+	filename := fmt.Sprintf("%d_characterimage.png", c.ID)
+	file, err := os.Create(filepath.Join(cd.DataDir, "img", filename))
+	if err != nil {
+		log.Printf("Error creating image file: %s", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	defer file.Close()
+
+	log.Printf("Writing image data to file %s", file.Name())
+	file.Write(imageDataBytes)
+
+	// Save the image data
+	c.CharacterImage = filename
 	cd.UpdateCardData()
 	cd.SaveCardMap()
 

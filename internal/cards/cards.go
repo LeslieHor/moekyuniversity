@@ -12,6 +12,7 @@ import (
 
 type CardData struct {
 	CardsFile string
+	DataDir   string
 	BackupDir string
 	StaticDir string
 	FuncMap map[string]interface{}
