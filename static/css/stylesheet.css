@@ -3,7 +3,7 @@ html {
     color: rgb(255, 255, 255);
     width: 80%;
     margin: 0 auto;
-    font-family: sans-serif;
+    font-family: "Noto Sans", "Noto Sans CJK JP", sans-serif;
 }
 
 .flow {
