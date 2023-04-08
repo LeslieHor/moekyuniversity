@@ -96,6 +96,21 @@ func (cd *CardData) GetCard(id int) *Card {
 	return c
 }
 
+func (cd *CardData) DeleteCard(id int) {
+	cd.BackupCardMap()
+
+	delete(cd.Cards, id)
+
+	// Iterate through all cards and remove the deleted card from their
+	// ComponentSubjectIDs and AmalgamationSubjectIDs
+	for _, c := range cd.Cards {
+		c.ComponentSubjectIDs = removeInt(c.ComponentSubjectIDs, id)
+		c.AmalgamationSubjectIDs = removeInt(c.AmalgamationSubjectIDs, id)
+	}
+
+	log.Printf("Deleted card %d", id)
+}
+
 func filterCardsByLearned(cardData []*Card) []*Card {
 	return append(filterCardsByLearningStage(cardData, Learned), filterCardsByLearningStage(cardData, Burned)...)
 }
@@ -358,4 +373,13 @@ func containsInt(s []int, e int) bool {
 		}
 	}
 	return false
+}
+
+func removeInt(s []int, e int) []int {
+	for i, a := range s {
+		if a == e {
+			return append(s[:i], s[i+1:]...)
+		}
+	}
+	return s
 }

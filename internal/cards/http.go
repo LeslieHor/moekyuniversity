@@ -44,6 +44,7 @@ func SetupRoutes(cd *CardData) {
 	r.HandleFunc("/card/{id}/edit", cd.CardJsonEditHandler)
 	r.HandleFunc("/card/{id}/edit/save", cd.CardJsonEditSaveHandler)
 	r.HandleFunc("/card/{id}/edit/characterimageupload", cd.CardCharacterImageUploadHandler)
+	r.HandleFunc("/card/{id}/delete", cd.CardDeleteHandler)
 
 	r.HandleFunc("/cardoverview", cd.OverviewByLearningStageHandler)
 	r.HandleFunc("/cardoverview/bylearningstage", cd.OverviewByLearningStageHandler)
@@ -312,6 +313,23 @@ func (cd *CardData) CardNewHandler(w http.ResponseWriter, r *http.Request) {
 	cd.SaveCardMap()
 
 	http.Redirect(w, r, fmt.Sprintf("/card/%d", c.ID), http.StatusFound)
+}
+
+func (cd *CardData) CardDeleteHandler(w http.ResponseWriter, r *http.Request) {
+	// Get card ID from URL
+	vars := mux.Vars(r)
+	id, err := strconv.Atoi(vars["id"])
+	if err != nil {
+		panic(err)
+	}
+	log.Printf("Deleting card %d", id)
+
+	// Delete the card
+	cd.DeleteCard(id)
+	cd.UpdateCardData()
+	cd.SaveCardMap()
+	
+	http.Redirect(w, r, "/", http.StatusFound)
 }
 
 type CardOverviewData struct {

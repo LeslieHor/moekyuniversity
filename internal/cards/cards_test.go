@@ -48,3 +48,32 @@ func TestSearch(t *testing.T) {
 	results = cd.Search("Thing")
 	checkSearchResults(t, results, []int{2, 4, 6})
 }
+
+func TestDelete(t *testing.T) {
+	c1 := createCardWithMeaning(1, "一", "One")
+	c2 := createCardWithMeaning(2, "一つ", "One thing")
+	c2.ComponentSubjectIDs = []int{1}
+	c2.AmalgamationSubjectIDs = []int{1}
+	c3 := createCardWithMeaning(3, "二", "Two")
+	c4 := createCardWithMeaning(4, "二つ", "Two things")
+	c5 := createCardWithMeaning(5, "三", "Three")
+	c6 := createCardWithMeaning(6, "三つ", "Three things")
+	cd := CreateCardDataFromSlice([]*Card{c1, c2, c3, c4, c5, c6})
+
+	// Delete card 1
+	cd.DeleteCard(1)
+
+	// Check that card 1 is gone
+	_, ok := cd.Cards[1]
+	if ok {
+		t.Errorf("Card 1 was not deleted")
+	}
+	
+	// Check that card 2's component and amalgamation subjects are gone
+	if len(cd.Cards[2].ComponentSubjectIDs) != 0 {
+		t.Errorf("Card 2's component subject IDs were not deleted")
+	}
+	if len(cd.Cards[2].AmalgamationSubjectIDs) != 0 {
+		t.Errorf("Card 2's amalgamation subject IDs were not deleted")
+	}
+}
