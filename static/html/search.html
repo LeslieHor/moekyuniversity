@@ -17,7 +17,7 @@
                     <div>{{ (index .Meanings 0).Meaning }}</div>
                 </a>
             </div>
-            <div class="cardbar stage-{{ stripspaces .LearningStageString}}"></div>
+            <div class="tooltip cardbar stage-{{ stripspaces .LearningStageString}}"><span class="tooltiptext">{{.LearningStageString}}</span></div>
         </div>
         {{end}}
     </div>
