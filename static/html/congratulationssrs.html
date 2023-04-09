@@ -13,7 +13,7 @@
     <div class="srs-congratulations">
         Congratulations!<br>
         <br>
-        <span class="congratulations-character inline-highlight {{.Card.Object}}-highlight">{{.Card.Characters}}</span>
+        <span class="congratulations-character inline-highlight {{.Card.Object}}-highlight">{{if .Card.CharacterImage}}<img class="character-image" src="/data/img/{{.Card.CharacterImage}}"/>{{else}}{{.Card.Characters}}{{end}}</span>
         <br><br>
         is now in the<br><br>
         <span class="congratulations-learning-stage stage-{{.Card.LearningStageString}}">{{.Card.LearningStageString}}</span><br><br>

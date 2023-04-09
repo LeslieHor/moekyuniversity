@@ -46,7 +46,6 @@ func SetupRoutes(cd *CardData) {
 	r.HandleFunc("/card/{id}/edit/save", cd.CardJsonEditSaveHandler)
 	r.HandleFunc("/card/{id}/edit/characterimageupload", cd.CardCharacterImageUploadHandler)
 	r.HandleFunc("/card/{id}/delete", cd.CardDeleteHandler)
-	r.HandleFunc("/card/{id}/addtoupnext", cd.CardAddToUpNextHandler)
 	r.HandleFunc("/card/{id}/tagsuspended", cd.CardTagSuspendedHandler)
 	r.HandleFunc("/card/{id}/addtoqueue", cd.CardAddToQueueHandler)
 
@@ -342,32 +341,6 @@ func (cd *CardData) CardDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	cd.SaveCardMap()
 
 	http.Redirect(w, r, "/", http.StatusFound)
-}
-
-func (cd *CardData) CardAddToUpNextHandler(w http.ResponseWriter, r *http.Request) {
-	// Get card ID from URL
-	vars := mux.Vars(r)
-	id, err := strconv.Atoi(vars["id"])
-	if err != nil {
-		panic(err)
-	}
-	log.Printf("Adding card %d to up next", id)
-
-	// Check that the card is available
-	c := cd.GetCard(id)
-	if c.LearningStage != Available {
-		log.Printf("Card %d is not available", id)
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-
-	// Add the card to the up next list
-	c.SetToUpNext()
-	cd.UpdateCardData()
-	cd.SaveCardMap()
-
-	// Redirect to the card page
-	http.Redirect(w, r, fmt.Sprintf("/card/%d", id), http.StatusFound)
 }
 
 func (cd *CardData) CardTagSuspendedHandler(w http.ResponseWriter, r *http.Request) {

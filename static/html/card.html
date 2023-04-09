@@ -39,8 +39,6 @@
     |
     <a href="/card/{{.Card.ID}}/json">View JSON</a>
     |
-    <a href="/card/{{.Card.ID}}/addtoupnext">Add to Up Next</a>
-    |
     <a href="/card/{{.Card.ID}}/edit">Edit</a>
     |
     <a onclick="tagSuspended()">Tag as Suspended</a>
@@ -172,7 +170,7 @@
                 <div>{{.Meaning}}</div>
             </a>
         </div>
-        <div class="cardbar stage-{{.LearningStageString}}"></div>
+        <div class="tooltip cardbar stage-{{ stripspaces .Card.LearningStageString}}"><span class="tooltiptext">{{.Card.LearningStageString}}</span></div>
     </div>
     {{end}}
 </div>

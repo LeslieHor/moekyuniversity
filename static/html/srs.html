@@ -25,7 +25,13 @@
 
 <div class="srs-card">
     <div class="srs-object-type">{{ .Card.Object }}</div>
-    <div class="{{ .Card.Object }}-highlight srs-jp">{{ .Card.Characters }}</div>
+    {{if .Card.CharacterImage}}
+    <div class="character-srs-image-container {{ .Card.Object }}-highlight srs-jp">
+        <img class="character-srs-image" src="/data/img/{{.Card.CharacterImage}}"/>
+    </div>
+    {{else}}
+    <div class="{{ .Card.Object }}-highlight srs-jp">{{.Card.Characters}}</div>
+    {{end}}
 </div>
 
 <br>

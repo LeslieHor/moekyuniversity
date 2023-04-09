@@ -283,6 +283,15 @@ a {
     background-color: rgb(88, 88, 88);
 }
 
+.character-srs-image-container {
+    padding: 40px;
+}
+
+.character-srs-image {
+    width: 200px;
+    height: auto;
+}
+
 .srs-jp {
     font-size: 10em;
     text-align: center;
