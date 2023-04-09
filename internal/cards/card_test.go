@@ -100,3 +100,38 @@ func TestCardUnavailable(t *testing.T) {
 		t.Errorf("Card stage string. Expected: %s, Got: %s", "Unavailable", c.LearningStageString)
 	}
 }
+
+func TestCardSetToUpNext(t *testing.T) {
+	c := CreateCard(1, 0, 0, "")
+	cd := CreateCardDataFromSlice([]*Card{c})
+	cd.UpdateCardData()
+	if c.LearningStage != Available {
+		t.Errorf("Card stage. Expected: %d, Got: %d", Available, c.LearningStage)
+	}
+
+	c.SetToUpNext()
+	cd.UpdateCardData()
+
+	if c.LearningStage != UpNext {
+		t.Errorf("Card stage. Expected: %d, Got: %d", UpNext, c.LearningStage)
+	}
+}
+
+func TestCardSetToUpNextFailure(t *testing.T) {
+	c1 := CreateCard(1, 0, 0, "")
+	c2 := CreateCard(2, 0, 0, "")
+	c2.ComponentSubjectIDs = []int{1}
+	cd := CreateCardDataFromSlice([]*Card{c1, c2})
+	cd.UpdateCardData()
+
+	if c2.LearningStage != Unavailable {
+		t.Errorf("Card stage. Expected: %d, Got: %d", Unavailable, c2.LearningStage)
+	}
+
+	c2.SetToUpNext()
+	cd.UpdateCardData()
+
+	if c2.LearningStage != Unavailable {
+		t.Errorf("Card stage. Expected: %d, Got: %d", Unavailable, c2.LearningStage)
+	}
+}

@@ -22,7 +22,12 @@ func main() {
 	log.Printf("Backup directory: %s", *backupDir)
 	log.Printf("Static directory: %s", *staticDir)
 
-	cardData := cards.CardData{CardsFile: *cardsFile, DataDir: *dataDir, BackupDir: *backupDir, StaticDir: *staticDir}
+	cardData := cards.CardData{
+		CardsFile: *cardsFile,
+		DataDir: *dataDir,
+		BackupDir: *backupDir,
+		StaticDir: *staticDir,
+	}
 	cardData.LoadCardJson()
 
 	cards.SetupRoutes(&cardData)

@@ -7,11 +7,21 @@
 
 <div class="links">
     <a href="/card/{{.Card.ID}}" target="_blank">View Card</a>
+    |
+    <a onclick="tagSuspended()">Tag as Suspended</a>
 </div>
 
 <hr>
 
 <br>
+
+{{ if eq .Card.LearningStageString "Up Next" }}
+<div class="srs-upnext">
+    <div class="srs-upnext-heading">Up Next</div>
+    <div class="srs-upnext-text">This card on your Up Next List.</div>
+</div>
+<br><br>
+{{ end }}
 
 <div class="srs-card">
     <div class="srs-object-type">{{ .Card.Object }}</div>
@@ -139,6 +149,17 @@
     function toggleAnswerInformation() {
         toggleAnswer("answer-information");
     }
+
+    function tagSuspended() {
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", "/card/{{.Card.ID}}/tagsuspended", true);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.send(JSON.stringify({}));
+        xhr.onloadend = function () {
+            window.location.reload();
+        };
+    }
+
 </script>
 
 {{ else }}

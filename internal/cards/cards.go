@@ -8,6 +8,7 @@ import (
 	"sort"
 	"time"
 	"path/filepath"
+	"os"
 )
 
 type CardData struct {
@@ -64,6 +65,15 @@ func (cd *CardData) UpdateCardData() {
 }
 
 func (cd *CardData) BackupCardMap() {
+	// If the backup directory doesn't exist, create it
+	if _, err := os.Stat(cd.BackupDir); os.IsNotExist(err) {
+		log.Printf("Creating backup directory %s", cd.BackupDir)
+		err := os.Mkdir(cd.BackupDir, 0755)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+
 	t := time.Now()
 	backupFilename := filepath.Join(cd.BackupDir, "cards-" + t.Format(time.RFC3339) + ".json")
 	log.Printf("Backing up cards to %s", backupFilename)
@@ -94,6 +104,21 @@ func (cd *CardData) AddCard(card *Card) {
 func (cd *CardData) GetCard(id int) *Card {
 	c := cd.Cards[id]
 	return c
+}
+
+func (cd *CardData) DeleteCard(id int) {
+	cd.BackupCardMap()
+
+	delete(cd.Cards, id)
+
+	// Iterate through all cards and remove the deleted card from their
+	// ComponentSubjectIDs and AmalgamationSubjectIDs
+	for _, c := range cd.Cards {
+		c.ComponentSubjectIDs = removeInt(c.ComponentSubjectIDs, id)
+		c.AmalgamationSubjectIDs = removeInt(c.AmalgamationSubjectIDs, id)
+	}
+
+	log.Printf("Deleted card %d", id)
 }
 
 func filterCardsByLearned(cardData []*Card) []*Card {
@@ -203,6 +228,36 @@ func filterCardsByReviewPerformance(cardData []*Card, lowerBound float64, upperB
 		// Calculate review performance
 		performance := card.GetReviewPerformance()
 		if performance >= lowerBound && performance <= upperBound {
+			cards = append(cards, card)
+		}
+	}
+	return cards
+}
+
+func filterCardsByTag(cardData []*Card, tag string) []*Card {
+	var cards []*Card
+	for _, card := range cardData {
+		if containsString(card.Tags, tag) {
+			cards = append(cards, card)
+		}
+	}
+	return cards
+}
+
+func filterOutCardsByLearningStage(cardData []*Card, learningStage LearningStage) []*Card {
+	var cards []*Card
+	for _, card := range cardData {
+		if card.LearningStage != learningStage {
+			cards = append(cards, card)
+		}
+	}
+	return cards
+}
+
+func filterOutCardsByTag(cardData []*Card, tag string) []*Card {
+	var cards []*Card
+	for _, card := range cardData {
+		if !containsString(card.Tags, tag) {
 			cards = append(cards, card)
 		}
 	}
@@ -325,6 +380,39 @@ func (cd *CardData) GetAllPartsOfSpeech(id int) []PartOfSpeech {
 	return returnData
 }
 
+func (cd *CardData) GetTags() []string {
+	// Loop through all cards and get all tags
+	var tags []string
+	for _, card := range cd.Cards {
+		for _, tag := range card.Tags {
+			if !containsString(tags, tag) {
+				tags = append(tags, tag)
+			}
+		}
+	}
+
+	// Sort tags
+	sort.Strings(tags)
+	return tags
+}
+
+func (cd *CardData) GetNewCardId() int {
+	// Get the highest ID
+	var highestId int
+	for _, card := range cd.Cards {
+		if card.ID > highestId {
+			highestId = card.ID
+		}
+	}
+
+	// Set a minimum ID of 100000 to avoid conflicts with existing cards
+	if highestId < 100000 {
+		highestId = 100000
+	}
+
+	return highestId + 1
+}
+
 func containsString(s []string, e string) bool {
     for _, a := range s {
         if a == e {
@@ -341,4 +429,13 @@ func containsInt(s []int, e int) bool {
 		}
 	}
 	return false
+}
+
+func removeInt(s []int, e int) []int {
+	for i, a := range s {
+		if a == e {
+			return append(s[:i], s[i+1:]...)
+		}
+	}
+	return s
 }

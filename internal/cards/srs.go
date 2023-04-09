@@ -18,21 +18,42 @@ func (cd *CardData) GetNextSrsCard() SrsData {
 	// Get all cards that are due
 	c := cd.ToList()
 	dueCards := filterCardsByDueBefore(c, time.Now())
+	dueCards = filterOutCardsByTag(dueCards, "suspended")
 
 	// Prioritise cards that are new
 	// Prioritise cards that are in the learning stage
 	// Don't sort by due date to add randomness to review order
-	upNextCards := filterCardsByLearningStage(c, UpNext)
-	upNextCards = filterCardsByHasNextReviewDate(upNextCards)
 	learningCards := filterCardsByLearningStage(dueCards, Learning)
 	learnedCards := filterCardsByLearningStage(dueCards, Learned)
 
-	dueCards = append(upNextCards, learningCards...)
-	dueCards = append(dueCards, learnedCards...)
+	upNextCards := filterCardsByLearningStage(dueCards, UpNext)
+	upNextCards = filterCardsByHasNextReviewDate(upNextCards)
+	// Limit to 5 UpNext cards
+	if len(upNextCards) > 5 {
+		upNextCards = upNextCards[:5]
+	}
+
+	// Sort upNextCards by due date as a hacky way to enforce order
+	upNextCards = sortCardsByDue(upNextCards)
+
+	// Up next cards are placed after you've reviewed everything
+	srsDueCards := append(learningCards, learnedCards...)
+
+	// Display the number of reviews.
+	// If there are no due cards, then display the number of up next cards.
+	// As this means the user has reviewed everything and is now looking at new cards.
+	var l int
+	if len(srsDueCards) == 0 {
+		l = len(upNextCards)
+	} else {
+		l = len(srsDueCards)
+	}
+
+	srsDueCards = append(srsDueCards, upNextCards...)
 
 	// Get the first card
 	var card *Card
-	if len(dueCards) == 0 {
+	if len(srsDueCards) == 0 {
 		srsData := SrsData{
 			DueCount: 0,
 			LearningCount: 0,
@@ -43,10 +64,10 @@ func (cd *CardData) GetNextSrsCard() SrsData {
 		return srsData
 	}
 
-	card = dueCards[0]
+	card = srsDueCards[0]
 	// Create SRS data
 	srsData := SrsData{
-		DueCount: len(dueCards),
+		DueCount: l,
 		LearningCount: len(learningCards),
 		Card: card,
 		MeaningMnemonicHtml: template.HTML(
@@ -71,9 +92,7 @@ func (c *Card) CorrectAnswer() {
 		log.Printf("Card %d was reviewed too early. Next review date is %s", c.ID, c.NextReviewDate)
 		return
 	}
-
-	// Interval doubles every time the card is answered correctly.
-
+	
 	if c.LearningStage == Learning { // Learning stage
 		c.LearningInterval *= 2
 
@@ -130,17 +149,28 @@ func (c *Card) IncorrectAnswer() {
 		if c.LearningInterval < 3 {
 			c.LearningInterval = 3
 		}
-
+		c.IncrementReviewCount()
+		c.SetNextFailedReviewDate()
 	} else if c.LearningStage == Learned { // Learned stage
 		c.Interval /= 2
 
 		// Card gets downgraded to the learning stage
 		c.LearningStage = Learning
 		c.LearningInterval = 3 // Initial LearningInterval is 3 hours
-	}
 
-	c.IncrementReviewCount()
-	c.SetNextFailedReviewDate()
+		c.IncrementReviewCount()
+		c.SetNextFailedReviewDate()
+	} else if c.LearningStage == UpNext { // Up next stage
+		// If the card is in the up next stage, then it is being reviewed for the first time.
+		// If the answer is incorrect, then the card is rescheduled for the NextReviewDate + 10 minutes.
+		// Since the card's NextReviewDate is initialised to 1970-01-01, this will result in the card being reviewed immediately after the current queue of up next cards are done.
+		nrd, err := time.Parse(time.RFC3339, c.NextReviewDate)
+		if err != nil {
+			log.Printf("Card %d has an invalid NextReviewDate: %s", c.ID, c.NextReviewDate)
+			panic(err)
+		}
+		c.NextReviewDate = nrd.Add(10 * time.Minute).Format(time.RFC3339)
+	}
 }
 
 func (c *Card) SetNextReviewDate() {

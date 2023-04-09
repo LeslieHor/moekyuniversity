@@ -1,6 +1,8 @@
 package cards
 
-import ()
+import (
+	"time"
+)
 
 type LearningStage int
 
@@ -22,6 +24,19 @@ var LearningStages = []LearningStage{
 	Burned,
 }
 
+type Meaning struct {
+	Meaning        string `json:"meaning"`
+	Primary        bool   `json:"primary"`
+	AcceptedAnswer bool   `json:"accepted_answer"`
+}
+
+type Reading struct {
+	Reading        string `json:"reading"`
+	Type           string `json:"type"`
+	Primary        bool   `json:"primary"`
+	AcceptedAnswer bool   `json:"accepted_answer"`
+}
+
 type Card struct {
 	ID             int    `json:"id"`
 	Object         string `json:"object"`
@@ -30,17 +45,8 @@ type Card struct {
 	Characters     string `json:"characters"`
 	CharacterImage string `json:"character_image"`
 	CharacterAlt   string `json:"character_alt"`
-	Meanings       []struct {
-		Meaning        string `json:"meaning"`
-		Primary        bool   `json:"primary"`
-		AcceptedAnswer bool   `json:"accepted_answer"`
-	} `json:"meanings"`
-	Readings []struct {
-		Reading        string `json:"reading"`
-		Type           string `json:"type"`
-		Primary        bool   `json:"primary"`
-		AcceptedAnswer bool   `json:"accepted_answer"`
-	} `json:"readings"`
+	Meanings       []Meaning `json:"meanings"`
+	Readings       []Reading `json:"readings"`
 	PartsOfSpeech          []string `json:"parts_of_speech"`
 	ComponentSubjectIDs    []int    `json:"component_subject_ids"`
 	AmalgamationSubjectIDs []int    `json:"amalgamation_subject_ids"`
@@ -54,6 +60,8 @@ type Card struct {
 	TotalTimesCorrect  int    `json:"total_times_correct"`
 
 	LearningStage LearningStage `json:"learning_stage"` // 0 = Unavailable, 1 = Available, 2 = Learning, 3 = Learned, 4 = Burned
+
+	Tags []string `json:"tags"`
 
 	// Below is for html output
 	LearningStageString string `json:"learning_stage_string"` // Unavailable, Available, Learning, Learned, Burned
@@ -145,4 +153,18 @@ func (c *Card) IncrementReviewCount() {
 
 func (c *Card) IncrementCorrectAnswerCount() {
 	c.TotalTimesCorrect++
+}
+
+func (c *Card) SetToUpNext() {
+	// Check that the card is the in the Available stage
+	if c.LearningStage != Available {
+		return
+	}
+
+	// Set NextReviewDate to 1970-01-01T00:00:00Z
+	c.NextReviewDate = time.Unix(0, 0).Format(time.RFC3339)
+}
+
+func (c *Card) TagSuspended() {
+	c.Tags = []string{"suspended"}
 }

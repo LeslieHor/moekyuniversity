@@ -339,3 +339,15 @@ a {
     font-size: 1.5em;
     text-align: center;
 }
+
+.srs-upnext-heading {
+    font-size: 2.0em;
+    text-align: center;
+    background-color: rgb(255, 238, 160);
+    color: rgb(0, 0, 0);
+}
+
+.srs-upnext-text {
+    font-size: 1.5em;
+    text-align: center;
+}

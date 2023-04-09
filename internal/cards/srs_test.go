@@ -5,6 +5,40 @@ import (
 	"time"
 )
 
+func TestCorrectUpNextToLearning(t *testing.T) {
+	c := Card{
+		ID: 1,
+		Interval: 0,
+		LearningInterval: 0,
+		LearningStage: UpNext,
+		NextReviewDate: "1970-01-01T00:00:00Z", // 0 unix time
+	}
+
+	c.CorrectAnswer()
+	if c.Interval != 0 {
+		t.Errorf("Incorrect interval. Expected 0, got %d", c.Interval)
+	}
+	if c.LearningStage != Learning {
+		t.Errorf("Incorrect learning stage. Expected 1, got %d", c.LearningStage)
+	}
+	if c.LearningInterval != 3 {
+		t.Errorf("Incorrect learning interval. Expected 3, got %d", c.LearningInterval)
+	}
+	// Check the next review date is 3 hours in the future, rounded to the nearest hour.
+	// Formatted as RFC3339.
+	ExpectedNextReviewDate := time.Now().Add(time.Hour * 3).Round(time.Hour).Format(time.RFC3339)
+	if c.NextReviewDate != ExpectedNextReviewDate {
+		t.Errorf("Incorrect next review date. Expected %s, got %s", ExpectedNextReviewDate, c.NextReviewDate)
+	}
+
+	if c.TotalTimesReviewed != 1 {
+		t.Errorf("Incorrect total times reviewed. Expected 1, got %d", c.TotalTimesReviewed)
+	}
+	if c.TotalTimesCorrect != 1 {
+		t.Errorf("Incorrect total times correct. Expected 1, got %d", c.TotalTimesCorrect)
+	}
+}
+
 func TestCorrectLearningToLearning(t *testing.T) {
 	c := Card{
 		ID: 1,
@@ -136,6 +170,41 @@ func TestCorrectLearnedToBurned(t *testing.T) {
 	}
 	if c.TotalTimesCorrect != 1 {
 		t.Errorf("Incorrect total times correct. Expected 1, got %d", c.TotalTimesCorrect)
+	}
+}
+
+func TestIncorrectUpNextToUpNext(t *testing.T) {
+	c := Card{
+		ID: 1,
+		Interval: 0,
+		LearningInterval: 0,
+		LearningStage: UpNext,
+		NextReviewDate: "1970-01-01T00:00:00Z", // Any date in the past
+	}
+
+	c.IncorrectAnswer()
+	if c.Interval != 0 {
+		t.Errorf("Incorrect interval. Expected 0, got %d", c.Interval)
+	}
+	if c.LearningStage != UpNext {
+		t.Errorf("Incorrect learning stage. Expected 0, got %d", c.LearningStage)
+	}
+	if c.LearningInterval != 0 {
+		t.Errorf("Incorrect learning interval. Expected 0, got %d", c.LearningInterval)
+	}
+	// Check the next review date is 10 minutes after 1970-01-01T00:00:00Z.
+	// Formatted as RFC3339.
+	ExpectedNextReviewDate := time.Date(1970, 1, 1, 0, 10, 0, 0, time.UTC).Format(time.RFC3339)
+	if c.NextReviewDate != ExpectedNextReviewDate {
+		t.Errorf("Incorrect next review date. Expected %s, got %s", ExpectedNextReviewDate, c.NextReviewDate)
+	}
+
+	// We don't count incorrect answers for UpNext cards.
+	if c.TotalTimesReviewed != 0 {
+		t.Errorf("Incorrect total times reviewed. Expected 0, got %d", c.TotalTimesReviewed)
+	}
+	if c.TotalTimesCorrect != 0 {
+		t.Errorf("Incorrect total times correct. Expected 0, got %d", c.TotalTimesCorrect)
 	}
 }
 
@@ -372,15 +441,6 @@ func TestNextSrsCardUpNext(t *testing.T) {
 	if srsCard.Card.ID != c1.ID {
 		t.Errorf("Incorrect card returned. Expected %d, got %d", c1.ID, srsCard.Card.ID)
 	}
-
-	// Set the next review date to the future.
-	c1.NextReviewDate = time.Now().Add(1 * time.Hour).Format(time.RFC3339)
-
-	// The card should still be returned as the next SRS card.
-	srsCard = cd.GetNextSrsCard()
-	if srsCard.Card.ID != c1.ID {
-		t.Errorf("Incorrect card returned. Expected %d, got %d", c1.ID, srsCard.Card.ID)
-	}
 }
 
 func TestNextSrsCardLearning(t *testing.T) {
@@ -428,27 +488,37 @@ func TestNextSrsCardUpNextPriority(t *testing.T) {
 	c2 := &Card{ID: 2, LearningStage: Learning, NextReviewDate: "2020-01-01T00:00:00Z"}
 	cd := CreateCardDataFromSlice([]*Card{c1, c2})
 
-	// The card with the earlier ID should be returned as the next SRS card.
+	// The card that is Learning should be returned as the next SRS card.
 	srsCard := cd.GetNextSrsCard()
-	if srsCard.Card.ID != c1.ID {
-		t.Errorf("Incorrect card returned. Expected %d, got %d", c1.ID, srsCard.Card.ID)
-	}
-
-	// Set the next review date to the future.
-	c1.NextReviewDate = time.Now().Add(1 * time.Hour).Format(time.RFC3339)
-
-	// The UpNext card should still be returned as the next SRS card.
-	srsCard = cd.GetNextSrsCard()
-	if srsCard.Card.ID != c1.ID {
-		t.Errorf("Incorrect card returned. Expected %d, got %d", c1.ID, srsCard.Card.ID)
-	}
-
-	// Set the status to Learning.
-	c1.LearningStage = Learning
-	
-	// The c2 Learning card should now be returned as the next SRS card, as it has the earliest next review date.
-	srsCard = cd.GetNextSrsCard()
 	if srsCard.Card.ID != c2.ID {
 		t.Errorf("Incorrect card returned. Expected %d, got %d", c2.ID, srsCard.Card.ID)
+	}
+}
+
+func TestNextSrsUpNext(t *testing.T) {
+	c1 := &Card{ID: 1, LearningStage: UpNext, NextReviewDate: "1970-01-01T00:00:00Z"}
+	c2 := &Card{ID: 2, LearningStage: UpNext, NextReviewDate: "1970-01-01T00:00:00Z"}
+	c3 := &Card{ID: 3, LearningStage: UpNext, NextReviewDate: "1970-01-01T00:00:00Z"}
+	c4 := &Card{ID: 4, LearningStage: UpNext, NextReviewDate: "1970-01-01T00:00:00Z"}
+	c5 := &Card{ID: 5, LearningStage: UpNext, NextReviewDate: "1970-01-01T00:00:00Z"}
+	c6 := &Card{ID: 6, LearningStage: UpNext, NextReviewDate: "1970-01-01T00:00:00Z"}
+	
+	cd := CreateCardDataFromSlice([]*Card{c1, c2, c3, c4, c5, c6})
+
+	// UpNext cards should be limited to 5.
+	srsCard := cd.GetNextSrsCard()
+	if srsCard.DueCount != 5 {
+		t.Errorf("Incorrect number of cards returned. Expected %d, got %d", 5, srsCard.DueCount)
+	}
+}
+
+func TestSuspended(t *testing.T) {
+	c1 := &Card{ID: 1, LearningStage: UpNext, NextReviewDate: "1970-01-01T00:00:00Z", Tags: []string{"suspended"}}
+	cd := CreateCardDataFromSlice([]*Card{c1})
+
+	// The card should not be returned as the next SRS card.
+	srsCard := cd.GetNextSrsCard()
+	if srsCard.Card != nil {
+		t.Errorf("Incorrect card returned. Expected nil, got a card")
 	}
 }
