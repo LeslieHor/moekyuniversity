@@ -2,9 +2,7 @@
 {{ define "title" }}
 Editing:
 <span class="id">{{.CardDataTree.Card.ID}} - </span>
-<span class="characters {{.CardDataTree.Card.Object}}-highlight">{{if .CardDataTree.Card.CharacterImage}}<img
-        class="title-character-image"
-        src="/data/img/{{.CardDataTree.Card.CharacterImage}}" />{{else}}{{.CardDataTree.Card.Characters}}{{end}}</span>
+<span class="characters {{.CardDataTree.Card.Object}}-highlight">{{if .CardDataTree.Card.CharacterImage}}<img class="title-character-image" src="/data/img/{{.CardDataTree.Card.CharacterImage}}" />{{else}}{{.CardDataTree.Card.Characters}}{{end}}</span>
 {{if .CardDataTree.Card.Level}}<span class="level">Level {{.CardDataTree.Card.Level}}</span>{{end}}
 {{ end }}
 {{ define "head" }}
@@ -38,6 +36,15 @@ Editing:
     <div>This will reload the json and lose any changes you have manually made.</div>
     <input type="file" id="file" name="file" />
     <a onClick="uploadCharacterImage()">Upload</a>
+</div>
+
+<hr>
+
+<div class="section">
+    <div class="heading">Suggested Component IDs</div>
+    {{range .SuggestedComponents}}
+    <span class="characters inline-highlight {{.Object}}-highlight">{{.ID}}: <a href="/card/{{.ID}}">{{if .CharacterImage}}<img class="character-image" src="/data/img/{{.CharacterImage}}" />{{else}}{{.Characters}}{{end}} ({{ (index .Meanings 0).Meaning }})</a></span>
+    {{end}}
 </div>
 
 <hr>

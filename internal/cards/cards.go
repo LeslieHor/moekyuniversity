@@ -244,6 +244,16 @@ func filterCardsByTag(cardData []*Card, tag string) []*Card {
 	return cards
 }
 
+func filterCardsByCharacters(cardData []*Card, characters string) []*Card {
+	var cards []*Card
+	for _, card := range cardData {
+		if card.Characters == characters {
+			cards = append(cards, card)
+		}
+	}
+	return cards
+}
+
 func filterOutCardsByLearningStage(cardData []*Card, learningStage LearningStage) []*Card {
 	var cards []*Card
 	for _, card := range cardData {
@@ -338,6 +348,7 @@ func (cd *CardData) Search(search string) []*Card {
 
 	return cards
 }
+
 type PartOfSpeech struct {
 	Text string
 	Selected bool
@@ -432,6 +443,15 @@ func containsInt(s []int, e int) bool {
 }
 
 func removeInt(s []int, e int) []int {
+	for i, a := range s {
+		if a == e {
+			return append(s[:i], s[i+1:]...)
+		}
+	}
+	return s
+}
+
+func removeCard(s []*Card, e *Card) []*Card {
 	for i, a := range s {
 		if a == e {
 			return append(s[:i], s[i+1:]...)

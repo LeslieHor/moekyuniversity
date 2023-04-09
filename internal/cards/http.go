@@ -183,6 +183,7 @@ type CardEditData struct {
 		Text string
 		Selected bool
 	}
+	SuggestedComponents []*Card
 }
 
 func (cd *CardData) CardJsonEditHandler(w http.ResponseWriter, r *http.Request) {
@@ -194,8 +195,12 @@ func (cd *CardData) CardJsonEditHandler(w http.ResponseWriter, r *http.Request) 
 	}
 	c := cd.GetCard(id)
 	dt := c.GetDataTree(cd)
+	suggestedComponents := filterCardsByCharacters(cd.ToList(), c.Characters)
+	suggestedComponents = removeCard(suggestedComponents, c)
+
 	editData := CardEditData{
 		CardDataTree: dt,
+		SuggestedComponents: suggestedComponents,
 	}
 
 	cd.doTemplate(w, r, "cardjsonedit.html", editData)
