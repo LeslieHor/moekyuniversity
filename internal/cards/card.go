@@ -61,6 +61,8 @@ type Card struct {
 
 	LearningStage LearningStage `json:"learning_stage"` // 0 = Unavailable, 1 = Available, 2 = Learning, 3 = Learned, 4 = Burned
 
+	Tags []string `json:"tags"`
+
 	// Below is for html output
 	LearningStageString string `json:"learning_stage_string"` // Unavailable, Available, Learning, Learned, Burned
 }
@@ -161,4 +163,8 @@ func (c *Card) SetToUpNext() {
 
 	// Set NextReviewDate to 1970-01-01T00:00:00Z
 	c.NextReviewDate = time.Unix(0, 0).Format(time.RFC3339)
+}
+
+func (c *Card) TagSuspended() {
+	c.Tags = []string{"suspended"}
 }

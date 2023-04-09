@@ -42,6 +42,8 @@
     <a href="/card/{{.Card.ID}}/addtoupnext">Add to Up Next</a>
     |
     <a href="/card/{{.Card.ID}}/edit">Edit</a>
+    |
+    <a onclick="tagSuspended()">Tag as Suspended</a>
 </div>
 
 <hr>
@@ -80,6 +82,14 @@
 <div class="section">
     <span class="heading">Review Performance:</span>
     <span class="review-performance">{{.Card.TotalTimesCorrect}} / {{.Card.TotalTimesReviewed}} ({{ percent .Card.TotalTimesCorrect .Card.TotalTimesReviewed }}%)</span>
+</div>
+{{end}}
+
+{{ if .Card.Tags }}
+<div class="section">
+    <span class="heading">Tags:</span>
+    <span class="tags">
+        {{range $index, $element := .Card.Tags}}{{if $index}}, {{end}}{{$element}}{{end}}</span>
 </div>
 {{end}}
 
@@ -164,6 +174,19 @@
 </div>
 
 {{end}}
+
+<script>
+    function tagSuspended() {
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", "/card/{{.Card.ID}}/tagsuspended", true);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.send(JSON.stringify({}));
+        xhr.onloadend = function () {
+            window.location.reload();
+        };
+    }
+</script>
+
 {{end}}
 
 {{ template "templatemain.html" .}}

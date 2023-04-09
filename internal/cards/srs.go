@@ -18,6 +18,7 @@ func (cd *CardData) GetNextSrsCard() SrsData {
 	// Get all cards that are due
 	c := cd.ToList()
 	dueCards := filterCardsByDueBefore(c, time.Now())
+	dueCards = filterOutCardsByTag(dueCards, "suspended")
 
 	// Prioritise cards that are new
 	// Prioritise cards that are in the learning stage
@@ -25,7 +26,7 @@ func (cd *CardData) GetNextSrsCard() SrsData {
 	learningCards := filterCardsByLearningStage(dueCards, Learning)
 	learnedCards := filterCardsByLearningStage(dueCards, Learned)
 
-	upNextCards := filterCardsByLearningStage(c, UpNext)
+	upNextCards := filterCardsByLearningStage(dueCards, UpNext)
 	upNextCards = filterCardsByHasNextReviewDate(upNextCards)
 	// Limit to 5 UpNext cards
 	if len(upNextCards) > 5 {

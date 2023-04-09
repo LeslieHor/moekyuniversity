@@ -234,10 +234,30 @@ func filterCardsByReviewPerformance(cardData []*Card, lowerBound float64, upperB
 	return cards
 }
 
+func filterCardsByTag(cardData []*Card, tag string) []*Card {
+	var cards []*Card
+	for _, card := range cardData {
+		if containsString(card.Tags, tag) {
+			cards = append(cards, card)
+		}
+	}
+	return cards
+}
+
 func filterOutCardsByLearningStage(cardData []*Card, learningStage LearningStage) []*Card {
 	var cards []*Card
 	for _, card := range cardData {
 		if card.LearningStage != learningStage {
+			cards = append(cards, card)
+		}
+	}
+	return cards
+}
+
+func filterOutCardsByTag(cardData []*Card, tag string) []*Card {
+	var cards []*Card
+	for _, card := range cardData {
+		if !containsString(card.Tags, tag) {
 			cards = append(cards, card)
 		}
 	}
@@ -358,6 +378,22 @@ func (cd *CardData) GetAllPartsOfSpeech(id int) []PartOfSpeech {
 	}
 
 	return returnData
+}
+
+func (cd *CardData) GetTags() []string {
+	// Loop through all cards and get all tags
+	var tags []string
+	for _, card := range cd.Cards {
+		for _, tag := range card.Tags {
+			if !containsString(tags, tag) {
+				tags = append(tags, tag)
+			}
+		}
+	}
+
+	// Sort tags
+	sort.Strings(tags)
+	return tags
 }
 
 func (cd *CardData) GetNewCardId() int {
