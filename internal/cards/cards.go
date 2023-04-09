@@ -16,6 +16,7 @@ type CardData struct {
 	DataDir   string
 	BackupDir string
 	StaticDir string
+	UpNext    []*Card
 	FuncMap map[string]interface{}
 	Cards map[int]*Card
 }
@@ -61,6 +62,14 @@ func (cd *CardData) UpdateCardData() {
 	 	}
 	}
 
+	// Check the UpNext list and remove any cards that are no longer in the UpNext stage
+	for i := 0; i < len(cd.UpNext); i++ {
+		if cd.UpNext[i].LearningStage != UpNext {
+			cd.UpNext = append(cd.UpNext[:i], cd.UpNext[i+1:]...)
+			i--
+		}
+	}
+
 	log.Println("Updated cards")
 }
 
@@ -95,6 +104,30 @@ func (cd *CardData) SaveCardMapToFilename(path string) {
 	if err != nil {
 		log.Fatal(err)
 	}
+}
+
+func (cd *CardData) AddUpNextCards(n int) {
+	// Add n cards to the up next list
+
+	cs := cd.ToList()
+	cs = filterCardsByLearningStage(cs, UpNext)
+	cs = sortCardsByDue(cs)
+	// Invert the card list to prioritise cards with alter due dates.
+	// This is because when cards are reviewed, the due date is pushed
+	// We want to review the cards we've seen more times, first.
+	cs = reverseCards(cs)
+
+	// Take the first n cards from the list and add them to the up next list
+	for i := 0; i < n; i++ {
+		if len(cs) > 0 {
+			cd.UpNext = append(cd.UpNext, cs[0])
+			cs = cs[1:]
+		}
+	}
+}
+
+func (cd *CardData) GetUpNextCards() []*Card {
+	return cd.UpNext
 }
 
 func (cd *CardData) AddCard(card *Card) {
@@ -315,6 +348,14 @@ func sortCardsByReviewPerformance(cards []*Card) []*Card {
 	sort.Slice(cards, func(i, j int) bool {
 		return cards[i].GetReviewPerformance() > cards[j].GetReviewPerformance()
 	})
+	return cards
+}
+
+func reverseCards(cards []*Card) []*Card {
+	for i := len(cards)/2 - 1; i >= 0; i-- {
+		opp := len(cards) - 1 - i
+		cards[i], cards[opp] = cards[opp], cards[i]
+	}
 	return cards
 }
 

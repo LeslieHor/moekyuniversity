@@ -436,6 +436,8 @@ func TestNextSrsCardUpNext(t *testing.T) {
 	c1 := &Card{ID: 1, LearningStage: UpNext, NextReviewDate: "2020-01-01T00:00:00Z"}
 	cd := CreateCardDataFromSlice([]*Card{c1})
 
+	cd.AddUpNextCards(1)
+
 	// The card should be returned as the next SRS card.
 	srsCard := cd.GetNextSrsCard()
 	if srsCard.Card.ID != c1.ID {
@@ -504,6 +506,8 @@ func TestNextSrsUpNext(t *testing.T) {
 	c6 := &Card{ID: 6, LearningStage: UpNext, NextReviewDate: "1970-01-01T00:00:00Z"}
 	
 	cd := CreateCardDataFromSlice([]*Card{c1, c2, c3, c4, c5, c6})
+
+	cd.AddUpNextCards(5)
 
 	// UpNext cards should be limited to 5.
 	srsCard := cd.GetNextSrsCard()
@@ -646,5 +650,47 @@ func TestAutoUpNextMultipleDependencies(t *testing.T) {
 	}
 	if c3.QueuedToLearn {
 		t.Errorf("Card should not be queued to learn")
+	}
+}
+
+func TestUpNextCards(t *testing.T) {
+	c1 := &Card{ID: 1, QueuedToLearn: true}
+	c2 := &Card{ID: 2, QueuedToLearn: true}
+	c3 := &Card{ID: 3, QueuedToLearn: true}
+	c4 := &Card{ID: 4, QueuedToLearn: true}
+	c5 := &Card{ID: 5, QueuedToLearn: true}
+	c6 := &Card{ID: 6, QueuedToLearn: true}
+	c7 := &Card{ID: 7, QueuedToLearn: true}
+
+	cd := CreateCardDataFromSlice([]*Card{c1, c2, c3, c4, c5, c6, c7})
+
+	cd.UpdateCardData()
+	cd.AddUpNextCards(5)
+
+	// c1 should be upnext
+	if c1.LearningStage != UpNext {
+		t.Errorf("Incorrect card stage. Expected %d, got %d", UpNext, c1.LearningStage)
+	}
+	if c1.QueuedToLearn {
+		t.Errorf("Card should not be queued to learn")
+	}
+
+	// There should be 5 upnext cards
+	unc := cd.GetUpNextCards()
+	if len(unc) != 5 {
+		t.Errorf("Incorrect number of upnext cards. Expected %d, got %d", 5, len(unc))
+	}
+
+	// Process 3 cards
+	unc[0].CorrectAnswer()
+	unc[1].CorrectAnswer()
+	unc[2].CorrectAnswer()
+
+	cd.UpdateCardData()
+	
+	// There should be 2 upnext cards
+	unc = cd.GetUpNextCards()
+	if len(unc) != 2 {
+		t.Errorf("Incorrect number of upnext cards. Expected %d, got %d", 2, len(unc))
 	}
 }

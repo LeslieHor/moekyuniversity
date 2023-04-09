@@ -26,15 +26,7 @@ func (cd *CardData) GetNextSrsCard() SrsData {
 	learningCards := filterCardsByLearningStage(dueCards, Learning)
 	learnedCards := filterCardsByLearningStage(dueCards, Learned)
 
-	upNextCards := filterCardsByLearningStage(dueCards, UpNext)
-	upNextCards = filterCardsByHasNextReviewDate(upNextCards)
-	// Limit to 5 UpNext cards
-	if len(upNextCards) > 5 {
-		upNextCards = upNextCards[:5]
-	}
-
-	// Sort upNextCards by due date as a hacky way to enforce order
-	upNextCards = sortCardsByDue(upNextCards)
+	upNextCards := cd.GetUpNextCards()
 
 	// Up next cards are placed after you've reviewed everything
 	srsDueCards := append(learningCards, learnedCards...)

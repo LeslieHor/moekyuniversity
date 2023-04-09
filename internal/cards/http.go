@@ -63,6 +63,7 @@ func SetupRoutes(cd *CardData) {
 	r.HandleFunc("/srs", cd.SrsHandler)
 	r.HandleFunc("/srs/correct/{id}", cd.SrsCorrectHandler)
 	r.HandleFunc("/srs/incorrect/{id}", cd.SrsIncorrectHandler)
+	r.HandleFunc("/srs/addupnextcards/{n}", cd.SrsAddUpNextCardsHandler)
 
 	r.HandleFunc("/search", cd.SearchHandler)
 
@@ -673,6 +674,20 @@ func (cd *CardData) SrsIncorrectHandler(w http.ResponseWriter, r *http.Request) 
 
 	cd.UpdateCardData()
 	cd.SaveCardMap()
+	
+	http.Redirect(w, r, "/srs", http.StatusFound)
+}
+
+func (cd *CardData) SrsAddUpNextCardsHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	n, err := strconv.Atoi(vars["n"])
+	if err != nil {
+		log.Printf("Error converting number to int: %s", err)
+		return
+	}
+
+	log.Printf("Adding %d cards to up next", n)
+	cd.AddUpNextCards(n)
 	
 	http.Redirect(w, r, "/srs", http.StatusFound)
 }
