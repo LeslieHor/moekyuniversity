@@ -13,11 +13,13 @@ const (
 	Learned
 	Burned
 	UpNext
+	QueuedToLearn
 )
 
 var LearningStages = []LearningStage{
 	Unavailable,
 	Available,
+	QueuedToLearn,
 	UpNext,
 	Learning,
 	Learned,
@@ -58,6 +60,7 @@ type Card struct {
 	NextReviewDate     string `json:"next_review_date"`  // RFC3339 date string
 	TotalTimesReviewed int    `json:"total_times_reviewed"`
 	TotalTimesCorrect  int    `json:"total_times_correct"`
+	QueuedToLearn      bool   `json:"queued_to_learn"`
 
 	LearningStage LearningStage `json:"learning_stage"` // 0 = Unavailable, 1 = Available, 2 = Learning, 3 = Learned, 4 = Burned
 
@@ -98,7 +101,26 @@ func (c *Card) UpdateLearningStage(cd *CardData) {
 	}
 
 	dt := c.GetDataTree(cd)
-	if dt.IsAllChildrenLearned() {
+	acl := dt.IsAllChildrenLearned()
+
+	if c.QueuedToLearn && acl {
+		// Card is queued to learn and all children are learned
+		// So it should be on the UpNext queue
+		c.LearningStage = UpNext
+		c.NextReviewDate = time.Unix(0, 0).Format(time.RFC3339)
+		c.LearningStageString = LearningStageToString(c.LearningStage)
+		c.QueuedToLearn = false
+		return
+
+	} else if c.QueuedToLearn && !acl {
+		// Card is queued to learn but not all children are learned
+		// So it should stay as queued to learn
+		c.LearningStage = QueuedToLearn
+		c.LearningStageString = LearningStageToString(c.LearningStage)
+		return
+	}
+
+	if acl {
 		c.LearningStage = Available
 		c.LearningStageString = LearningStageToString(c.LearningStage)
 		return
@@ -114,6 +136,8 @@ func LearningStageToString(ls LearningStage) string {
 		return "Unavailable"
 	case Available:
 		return "Available"
+	case QueuedToLearn:
+		return "Queued To Learn"
 	case UpNext:
 		return "Up Next"
 	case Learning:
@@ -167,4 +191,23 @@ func (c *Card) SetToUpNext() {
 
 func (c *Card) TagSuspended() {
 	c.Tags = []string{"suspended"}
+}
+
+func (c *Card) SetQueuedToLearn(cd *CardData) {
+	if ! c.IsQueueable() {
+		return
+	}
+
+	c.QueuedToLearn = true
+	for _, child := range c.ComponentSubjectIDs {
+		cd.Cards[child].SetQueuedToLearn(cd)
+	}
+}
+
+func (c *Card) IsQueueable() bool {
+	if c.LearningStage == Learned || c.LearningStage == Burned || c.LearningStage == UpNext {
+		return false
+	}
+
+	return true
 }

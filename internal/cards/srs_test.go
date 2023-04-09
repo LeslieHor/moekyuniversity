@@ -522,3 +522,129 @@ func TestSuspended(t *testing.T) {
 		t.Errorf("Incorrect card returned. Expected nil, got a card")
 	}
 }
+
+func TestAutoUpNext(t *testing.T) {
+	c1 := &Card{ID: 1, Interval: 500, LearningInterval: 0, NextReviewDate: time.Now().Add(24 * 30 * time.Hour).Format(time.RFC3339)}
+	c2 := &Card{ID: 2, Interval: 0, LearningInterval: 16, NextReviewDate: time.Now().Add(-2 * time.Hour).Format(time.RFC3339)}
+	c3 := &Card{ID: 3, Interval: 0, LearningInterval: 0, QueuedToLearn: true, NextReviewDate: "", ComponentSubjectIDs: []int{1, 2}}
+	cd := CreateCardDataFromSlice([]*Card{c1, c2, c3})
+	cd.UpdateCardData()
+
+	// c1 should be Learned
+	if c1.LearningStage != Learned {
+		t.Errorf("Incorrect card stage. Expected %d, got %d", Learned, c1.LearningStage)
+	}
+	// c2 should be Learning
+	if c2.LearningStage != Learning {
+		t.Errorf("Incorrect card stage. Expected %d, got %d", Learning, c2.LearningStage)
+	}
+	// c3 should be QueuedToLearn
+	if c3.LearningStage != QueuedToLearn {
+		t.Errorf("Incorrect card stage. Expected %d, got %d", QueuedToLearn, c3.LearningStage)
+	}
+
+	// Set c2 to learned
+	c2.CorrectAnswer()
+	cd.UpdateCardData()
+
+	// c2 should be Learned
+	if c2.LearningStage != Learned {
+		t.Errorf("Incorrect card stage. Expected %d, got %d", Learned, c2.LearningStage)
+	}
+
+	// c3 should now be UpNext
+	if c3.LearningStage != UpNext {
+		t.Errorf("Incorrect card stage. Expected %d, got %d", UpNext, c3.LearningStage)
+	}
+}
+
+func TestAutoUpNextMultipleDependencies(t *testing.T) {
+	c1 := &Card{ID: 1, Interval: 0, LearningInterval: 16, NextReviewDate: time.Now().Add(-2 * time.Hour).Format(time.RFC3339)}
+	c2 := &Card{ID: 2, Interval: 0, LearningInterval: 0, ComponentSubjectIDs: []int{1}}
+	c3 := &Card{ID: 3, Interval: 0, LearningInterval: 0, ComponentSubjectIDs: []int{2}}
+	cd := CreateCardDataFromSlice([]*Card{c1, c2, c3})
+	cd.UpdateCardData()
+
+	// c1 should be learning
+	if c1.LearningStage != Learning {
+		t.Errorf("Incorrect card stage. Expected %d, got %d", Learning, c1.LearningStage)
+	}
+	// c2 should be unavailable
+	if c2.LearningStage != Unavailable {
+		t.Errorf("Incorrect card stage. Expected %d, got %d", Unavailable, c2.LearningStage)
+	}
+	// c3 should be unavailable
+	if c3.LearningStage != Unavailable {
+		t.Errorf("Incorrect card stage. Expected %d, got %d", Unavailable, c3.LearningStage)
+	}
+	
+	// Set c3 to queued to learn
+	c3.SetQueuedToLearn(cd)
+	cd.UpdateCardData()
+
+	// c2 and c3 should be queued to learn
+	if !c2.QueuedToLearn {
+		t.Errorf("Card should be queued to learn")
+	}
+	if c2.LearningStage != QueuedToLearn {
+		t.Errorf("Incorrect card stage. Expected %d, got %d", QueuedToLearn, c2.LearningStage)
+	}
+	if !c3.QueuedToLearn {
+		t.Errorf("Card should be queued to learn")
+	}
+	if c3.LearningStage != QueuedToLearn {
+		t.Errorf("Incorrect card stage. Expected %d, got %d", QueuedToLearn, c3.LearningStage)
+	}
+
+	// Mark c1 as answered. It should now be learned.
+	c1.CorrectAnswer()
+	cd.UpdateCardData()
+
+	// c1 should be learned
+	if c1.LearningStage != Learned {
+		t.Errorf("Incorrect card stage. Expected %d, got %d", Learned, c1.LearningStage)
+	}
+
+	// c2 should now be upnext
+	if c2.LearningStage != UpNext {
+		t.Errorf("Incorrect card stage. Expected %d, got %d", UpNext, c2.LearningStage)
+	}
+	if c2.QueuedToLearn {
+		t.Errorf("Card should not be queued to learn")
+	}
+	// c3 should remain queued to learn
+	if c3.LearningStage != QueuedToLearn {
+		t.Errorf("Incorrect card stage. Expected %d, got %d", QueuedToLearn, c3.LearningStage)
+	}
+	if !c3.QueuedToLearn {
+		t.Errorf("Card should be queued to learn")
+	}
+
+	// Mark c2 as answered. It should now be learning
+	c2.CorrectAnswer()
+	cd.UpdateCardData()
+
+	// c2 should be learning
+	if c2.LearningStage != Learning {
+		t.Errorf("Incorrect card stage. Expected %d, got %d", Learning, c2.LearningStage)
+	}
+
+	// Fake c2 reviews
+	c2.NextReviewDate = time.Now().Add(-2 * time.Hour).Format(time.RFC3339)
+	c2.LearningInterval = 16
+	c2.CorrectAnswer()
+	cd.UpdateCardData()
+
+	// c2 should be learned
+	if c2.LearningStage != Learned {
+		t.Errorf("Incorrect card stage. Expected %d, got %d", Learned, c2.LearningStage)
+	}
+
+	// c3 should now be upnext
+	if c3.LearningStage != UpNext {
+		t.Errorf("Incorrect card stage. Expected %d, got %d", UpNext, c3.LearningStage)
+	}
+	if c3.QueuedToLearn {
+		t.Errorf("Card should not be queued to learn")
+	}
+}

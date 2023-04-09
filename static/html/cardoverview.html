@@ -43,7 +43,7 @@
                         <div>{{ (index .Meanings 0).Meaning }}</div>
                     </a>
                 </div>
-                <div class="cardbar stage-{{.LearningStageString}}"></div>
+                <div class="cardbar stage-{{ stripspaces .LearningStageString}}"></div>
             </div>
             {{end}}
         </div>

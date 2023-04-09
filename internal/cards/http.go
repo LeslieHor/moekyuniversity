@@ -11,6 +11,7 @@ import (
 	"io/ioutil"
 	"os"
 	"fmt"
+	"strings"
 
 	"github.com/gorilla/mux"
 )
@@ -47,6 +48,7 @@ func SetupRoutes(cd *CardData) {
 	r.HandleFunc("/card/{id}/delete", cd.CardDeleteHandler)
 	r.HandleFunc("/card/{id}/addtoupnext", cd.CardAddToUpNextHandler)
 	r.HandleFunc("/card/{id}/tagsuspended", cd.CardTagSuspendedHandler)
+	r.HandleFunc("/card/{id}/addtoqueue", cd.CardAddToQueueHandler)
 
 	r.HandleFunc("/cardoverview", cd.OverviewByLearningStageHandler)
 	r.HandleFunc("/cardoverview/bylearningstage", cd.OverviewByLearningStageHandler)
@@ -87,6 +89,12 @@ func (cd *CardData) SetupFuncMap() {
 		},
 		"percent": func(a, b int) int {
 			return a * 100 / b
+		},
+		"queueable": func(c *Card) bool {
+			return c.IsQueueable()
+		},
+		"stripspaces": func(s string) string {
+			return strings.ReplaceAll(s, " ", "")
 		},
 	}
 	cd.FuncMap = funcMap
@@ -380,6 +388,32 @@ func (cd *CardData) CardTagSuspendedHandler(w http.ResponseWriter, r *http.Reque
 	http.Redirect(w, r, fmt.Sprintf("/card/%d", id), http.StatusFound)
 }
 
+func (cd *CardData) CardAddToQueueHandler(w http.ResponseWriter, r *http.Request) {
+	// Get card ID from URL
+	vars := mux.Vars(r)
+	id, err := strconv.Atoi(vars["id"])
+	if err != nil {
+		panic(err)
+	}
+	log.Printf("Adding card %d to queue", id)
+
+	// Check that the card is available or unavailable
+	c := cd.GetCard(id)
+	if ! c.IsQueueable() {
+		log.Printf("Card %d is not queuable", id)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	// Add the card to the queue
+	c.SetQueuedToLearn(cd)
+	cd.UpdateCardData()
+	cd.SaveCardMap()
+
+	// Redirect to the card page
+	http.Redirect(w, r, fmt.Sprintf("/card/%d", id), http.StatusFound)
+}
+
 type CardOverviewData struct {
 	Title string
 	Cards []*Card
@@ -417,6 +451,7 @@ func (cd *CardData) OverviewByLearningStageHandler(w http.ResponseWriter, r *htt
 
 	codl = append(codl, getOverviewLearningStage(cl, Unavailable))
 	codl = append(codl, getOverviewLearningStage(cl, Available))
+	codl = append(codl, getOverviewLearningStage(cl, QueuedToLearn))
 	codl = append(codl, getOverviewLearningStage(cl, UpNext))
 	codl = append(codl, getOverviewLearningStage(cl, Learning))
 	codl = append(codl, getOverviewLearningStage(cl, Learned))

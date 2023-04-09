@@ -21,7 +21,7 @@
                 <div>{{ (index .Card.Meanings 0).Meaning }}</div>
             </a>
         </div>
-        <div class="cardbar stage-{{.Card.LearningStageString}}"></div>
+        <div class="tooltip cardbar stage-{{ stripspaces .Card.LearningStageString}}"><span class="tooltiptext">{{.Card.LearningStageString}}</span></div>
     </div>
 </li>
 <ul>
@@ -44,6 +44,10 @@
     <a href="/card/{{.Card.ID}}/edit">Edit</a>
     |
     <a onclick="tagSuspended()">Tag as Suspended</a>
+    {{ if queueable .Card }}
+    |
+    <a onclick="addToQueue()">Add to Queue</a>
+    {{ end }}
 </div>
 
 <hr>
@@ -179,6 +183,16 @@
     function tagSuspended() {
         var xhr = new XMLHttpRequest();
         xhr.open("GET", "/card/{{.Card.ID}}/tagsuspended", true);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.send(JSON.stringify({}));
+        xhr.onloadend = function () {
+            window.location.reload();
+        };
+    }
+
+    function addToQueue() {
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", "/card/{{.Card.ID}}/addtoqueue", true);
         xhr.setRequestHeader('Content-Type', 'application/json');
         xhr.send(JSON.stringify({}));
         xhr.onloadend = function () {
