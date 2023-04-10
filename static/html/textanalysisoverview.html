@@ -1,0 +1,16 @@
+{{ define "windowtitle" }}Text Analysis{{ end }}
+{{ define "title" }}Text Analysis{{ end }}
+
+{{ define "content" }}
+
+{{ range $index, $element := .TextAnalysisList }}
+<a href="/textanalysis/{{$element.ID}}">{{$element.Name}}</a><br>
+{{ end }}
+
+<hr>
+
+<a href="/textanalysis/new">New</a>
+
+{{ end }}
+
+{{ template "templatemain.html" .}}

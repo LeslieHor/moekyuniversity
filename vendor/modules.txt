@@ -1,2 +1,12 @@
+# github.com/google/uuid v1.3.0
+github.com/google/uuid
 # github.com/gorilla/mux v1.8.0
 github.com/gorilla/mux
+# github.com/ikawaha/kagome-dict v1.0.9
+github.com/ikawaha/kagome-dict/dict
+github.com/ikawaha/kagome-dict/dict/trie
+# github.com/ikawaha/kagome-dict/ipa v1.0.10
+github.com/ikawaha/kagome-dict/ipa
+# github.com/ikawaha/kagome/v2 v2.9.2
+github.com/ikawaha/kagome/v2/tokenizer
+github.com/ikawaha/kagome/v2/tokenizer/lattice

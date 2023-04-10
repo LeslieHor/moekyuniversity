@@ -139,6 +139,15 @@ func (cd *CardData) GetCard(id int) *Card {
 	return c
 }
 
+func (cd *CardData) FindVocabulary(vocabulary string) *Card {
+	for _, c := range cd.Cards {
+		if c.Characters == vocabulary && c.Object == "vocabulary" {
+			return c
+		}
+	}
+	return nil
+}
+
 func (cd *CardData) DeleteCard(id int) {
 	cd.BackupCardMap()
 

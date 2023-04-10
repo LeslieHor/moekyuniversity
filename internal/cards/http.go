@@ -13,6 +13,7 @@ import (
 	"fmt"
 	"strings"
 
+    "github.com/google/uuid"
 	"github.com/gorilla/mux"
 )
 
@@ -59,6 +60,11 @@ func SetupRoutes(cd *CardData) {
 	r.HandleFunc("/cardoverview/bytag", cd.OverviewByTagHandler)
 	r.HandleFunc("/cardoverview/debug", cd.OverviewDebugHandler)
 	
+	r.HandleFunc("/textanalysis", cd.TextAnalysisHandler)
+	r.HandleFunc("/textanalysis/new", cd.TextAnalysisNewHandler)
+	r.HandleFunc("/textanalysis/new/submit", cd.TextAnalysisNewSubmitHandler)
+	r.HandleFunc("/textanalysis/{id}", cd.TextAnalysisIdHandler)
+	r.HandleFunc("/textanalysis/{id}/delete", cd.TextAnalysisIdDeleteHandler)
 
 	r.HandleFunc("/srs", cd.SrsHandler)
 	r.HandleFunc("/srs/correct/{id}", cd.SrsCorrectHandler)
@@ -95,6 +101,9 @@ func (cd *CardData) SetupFuncMap() {
 		},
 		"stripspaces": func(s string) string {
 			return strings.ReplaceAll(s, " ", "")
+		},
+		"newlinetohtml": func(s string) template.HTML {
+			return template.HTML(strings.ReplaceAll(s, "\r\n", "<br>"))
 		},
 	}
 	cd.FuncMap = funcMap
@@ -596,6 +605,123 @@ func (cd *CardData) OverviewDebugHandler(w http.ResponseWriter, r *http.Request)
 	codl = append(codl, o)
 
 	cd.doTemplate(w, r, "cardoverview.html", codl)
+}
+
+func (cd *CardData) TextAnalysisHandler(w http.ResponseWriter, r *http.Request) {
+	// Read all the files in the text analysis directory
+	files, err := ioutil.ReadDir("data/text_analysis")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	var taList []TextAnalysis
+	for _, f := range files {
+		// Get the json data for the id
+		filepath := filepath.Join(cd.DataDir, "text_analysis", f.Name())
+		file, err := os.Open(filepath)
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer file.Close()
+
+		// Decode the json data
+		var ta TextAnalysis
+		decoder := json.NewDecoder(file)
+		err = decoder.Decode(&ta)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		taList = append(taList, ta)
+	}
+
+	pageData := struct {
+		TextAnalysisList []TextAnalysis
+	}{
+		TextAnalysisList: taList,
+	}
+
+	cd.doTemplate(w, r, "textanalysisoverview.html", pageData)
+}
+
+func (cd *CardData) TextAnalysisIdHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id := vars["id"]
+
+	// Get the json data for the id
+	filepath := filepath.Join(cd.DataDir, "text_analysis", id+".json")
+	f, err := os.Open(filepath)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer f.Close()
+
+	// Decode the json data
+	var ta TextAnalysis
+	decoder := json.NewDecoder(f)
+	err = decoder.Decode(&ta)
+	if err != nil {
+		log.Fatal(err)
+	}
+	ta.Analyse()
+	cd.AddLearningStages(&ta)
+
+	// Replace newlines with <br>
+	htmlText := strings.Replace(ta.Text, "\r\n", "<br>", -1)
+	htmlText = strings.Replace(htmlText, "\r", "<br>", -1)
+	htmlText = strings.Replace(htmlText, "\n", "<br>", -1)
+
+	pageData := struct {
+		TextAnalysis TextAnalysis
+		HTMLSafeText template.HTML
+	}{
+		TextAnalysis: ta,
+		HTMLSafeText: template.HTML(htmlText),
+	}
+
+	cd.doTemplate(w, r, "textanalysis.html", pageData)
+}
+
+func (cd *CardData) TextAnalysisNewHandler(w http.ResponseWriter, r *http.Request) {
+	cd.doTemplate(w, r, "textanalysisnew.html", nil)
+}
+
+func (cd *CardData) TextAnalysisNewSubmitHandler(w http.ResponseWriter, r *http.Request) {
+	// Get the text from the form
+	name := r.FormValue("name")
+	text := r.FormValue("text")
+
+	log.Printf("New text analysis: %s", name)
+	log.Printf("Text: %s", text)
+
+	// Create a new text analysis
+	ta := TextAnalysis{
+		ID:   uuid.New().String(),
+		Name: name,
+		Text: text,
+	}
+
+	// Save the text analysis
+	filepath := filepath.Join(cd.DataDir, "text_analysis", ta.ID+".json")
+	ta.Save(filepath)
+
+	// Redirect to the text analysis page
+	http.Redirect(w, r, "/textanalysis/"+ta.ID, http.StatusFound)
+}
+
+func (cd *CardData) TextAnalysisIdDeleteHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id := vars["id"]
+
+	// Delete the file
+	filepath := filepath.Join(cd.DataDir, "text_analysis", id+".json")
+	err := os.Remove(filepath)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// Redirect to the text analysis overview page
+	http.Redirect(w, r, "/textanalysis", http.StatusFound)
 }
 
 func (cd *CardData) SearchHandler(w http.ResponseWriter, r *http.Request) {
