@@ -27,6 +27,9 @@ func (cd *CardData) GetNextSrsCard() SrsData {
 	learnedCards := filterCardsByLearningStage(dueCards, Learned)
 
 	upNextCards := cd.GetUpNextCards()
+	// Invert the order of the up next cards
+	// To ensure that least seen cards are reviewed first
+	upNextCards = reverseCards(upNextCards)
 
 	// Up next cards are placed after you've reviewed everything
 	srsDueCards := append(learningCards, learnedCards...)
