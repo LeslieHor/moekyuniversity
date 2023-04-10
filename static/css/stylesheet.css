@@ -418,3 +418,8 @@ a {
 .ta-analysed-text {
     font-size: 1.5em;
 }
+
+.a-none {
+    text-decoration: none;
+    color: inherit;
+}

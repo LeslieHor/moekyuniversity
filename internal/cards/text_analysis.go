@@ -20,6 +20,7 @@ type Token struct {
 	BaseForm string
 	POS []string
 	Pronunciation string
+	CardId int
 	LearningStage LearningStage
 	LearningStageString string
 }
@@ -61,6 +62,7 @@ func (cd *CardData) AddLearningStages(ta *TextAnalysis) {
 	for i, token := range ta.Tokens {
 		c := cd.FindVocabulary(token.BaseForm)
 		if c != nil {
+			ta.Tokens[i].CardId = c.ID
 			ta.Tokens[i].LearningStage = c.LearningStage
 			ta.Tokens[i].LearningStageString = LearningStageToString(c.LearningStage)
 		}

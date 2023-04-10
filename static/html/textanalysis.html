@@ -29,8 +29,7 @@
         </summary>
         <div class="ta-analysed-text">
             {{ range $index, $element := .TextAnalysis.Tokens }}<span
-                class="ta-token stage-{{$element.LearningStageString}}">{{ newlinetohtml
-                $element.Surface}}</span>{{end}}
+                class="ta-token stage-{{$element.LearningStageString}}"><span class="tooltip">{{if $element.CardId }}<a class="a-none" href="/card/{{.CardId}}">{{ newlinetohtml $element.Surface}}</a>{{else}}{{ newlinetohtml $element.Surface}}{{end}}<span class="tooltiptext">{{$element.BaseForm}}</span></span></span>{{end}}
         </div>
     </details>
 </div>
