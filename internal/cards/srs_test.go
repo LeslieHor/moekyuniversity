@@ -694,3 +694,37 @@ func TestUpNextCards(t *testing.T) {
 		t.Errorf("Incorrect number of upnext cards. Expected %d, got %d", 2, len(unc))
 	}
 }
+
+func TestUpNextOrder(t *testing.T) {
+	c1 := &Card{ID: 1, Interval: 0, LearningInterval: 0, NextReviewDate: "1970-01-01T00:00:00Z"}
+	c2 := &Card{ID: 2, Interval: 0, LearningInterval: 0, NextReviewDate: "1970-01-01T00:10:00Z"}
+	c4 := &Card{ID: 4, Interval: 0, LearningInterval: 0, NextReviewDate: "1970-01-01T00:30:00Z"}
+	c5 := &Card{ID: 5, Interval: 0, LearningInterval: 0, NextReviewDate: "1970-01-01T00:40:00Z"}
+	c3 := &Card{ID: 3, Interval: 0, LearningInterval: 0, NextReviewDate: "1970-01-01T00:20:00Z"}
+	c6 := &Card{ID: 6, Interval: 0, LearningInterval: 0, NextReviewDate: "1970-01-01T00:50:00Z"}
+	c7 := &Card{ID: 7, Interval: 0, LearningInterval: 0, NextReviewDate: "1970-01-01T01:00:00Z"}
+
+	cd := CreateCardDataFromSlice([]*Card{c1, c2, c3, c4, c5, c6, c7})
+
+	cd.UpdateCardData()
+	cd.AddUpNextCards(5)
+
+	// c1 should be upnext
+	if c1.LearningStage != UpNext {
+		t.Errorf("Incorrect card stage. Expected %d, got %d", UpNext, c1.LearningStage)
+	}
+	if c1.QueuedToLearn {
+		t.Errorf("Card should not be queued to learn")
+	}
+
+	// There should be 5 upnext cards
+	unc := reverseCards(cd.GetUpNextCards())
+	if len(unc) != 5 {
+		t.Errorf("Incorrect number of upnext cards. Expected %d, got %d", 5, len(unc))
+	}
+
+	// First card should be c3
+	if unc[0].ID != 3 {
+		t.Errorf("Incorrect card. Expected %d, got %d", 5, unc[0].ID)
+	}
+}
