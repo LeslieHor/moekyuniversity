@@ -137,6 +137,20 @@ func main() {
 		},
 	}
 
+	i++
+	cs[i] = &cards.Card{
+		ID: i,
+		Object: "vocabulary",
+		Characters: "食べる",
+		Meanings: []cards.Meaning {
+			{"To eat", true, true},
+			{"two", false, false},
+		},
+		Interval: 500,
+		LearningInterval: 0,
+		NextReviewDate: time.Now().Format(time.RFC3339),
+	}
+
 	cardData.Cards = cs
 	cardData.SaveCardMap()
 }

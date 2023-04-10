@@ -1,0 +1,68 @@
+{{ define "windowtitle" }}Text Analysis - {{.TextAnalysis.Name}}{{ end }}
+{{ define "title" }}{{.TextAnalysis.Name}}{{ end }}
+
+{{ define "content" }}
+
+<div class="links">
+    <a href="/textanalysis/{{.TextAnalysis.ID}}/delete">Delete</a>
+</div>
+
+<hr>
+
+<div>Non highlighted text is not in the card database. This could include particles, words written in hiragana but exist as kanji in the cards, words that don't exist in the card database at all and need to be added.</div>
+
+<div class="section">
+    <div class="heading">Key</div>
+    <span class="stage-Unavailable">Unavailable</span>
+    <span class="stage-Available">Available</span>
+    <span class="stage-QueuedToLearn">Queued to Learn</span>
+    <span class="stage-UpNext">Up Next</span>
+    <span class="stage-Learning">Learning</span>
+    <span class="stage-Learned">Learned</span>
+    <span class="stage-Burned">Burned</span>
+</div>
+
+<div class="section">
+    <details open>
+        <summary>
+            <span class="heading">Analysed Text</span>
+        </summary>
+        <div class="ta-analysed-text">
+            {{ range $index, $element := .TextAnalysis.Tokens }}<span
+                class="ta-token stage-{{$element.LearningStageString}}">{{ newlinetohtml
+                $element.Surface}}</span>{{end}}
+        </div>
+    </details>
+</div>
+
+<div class="section">
+    <details>
+        <summary>
+            <span class="heading">Original Text</span>
+        </summary>
+        <div class="ta-original-text">{{.HTMLSafeText}}</div>
+    </details>
+</div>
+
+<div class="section">
+    <details>
+        <summary>
+            <span class="heading">Tokens</span>
+        </summary>
+        {{ range $index, $element := .TextAnalysis.Tokens }}
+        <hr>
+        <div>
+            <div>Surface: {{$element.Surface}}</div>
+            <div>Base Form: {{$element.BaseForm}}</div>
+            <div>Part of Speech: {{$element.POS}}</div>
+            <div>Pronunciation: {{$element.Pronunciation}}</div>
+            <div>Learning Stage: {{$element.LearningStage}}</div>
+            <div>Learning Stage String: {{$element.LearningStageString}}</div>
+        </div>
+        {{ end }}
+    </details>
+</div>
+
+{{ end }}
+
+{{ template "templatemain.html" .}}

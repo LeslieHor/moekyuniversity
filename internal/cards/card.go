@@ -77,7 +77,7 @@ func (c *Card) UpdateLearningStage(cd *CardData) {
 		return
 	}
 
-	if c.Interval > 24 &&
+	if c.Interval >= 24 &&
 		c.LearningInterval == 0 &&
 		c.NextReviewDate != "" {
 		c.LearningStage = Learned

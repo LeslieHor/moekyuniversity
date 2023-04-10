@@ -1,0 +1,19 @@
+{{ define "windowtitle" }}Text Analysis - New{{ end }}
+{{ define "title" }}Text Analysis - New{{ end }}
+
+{{ define "content" }}
+
+<form action="/textanalysis/new/submit" method="post">
+    <div class="form-group">
+        <label for="name">Name</label>
+        <input type="text" class="form-control" id="name" name="name" placeholder="Name">
+    </div>
+    <div class="form-group">
+        <label for="text">Text</label>
+        <textarea class="form-control" id="text" name="text" rows="3"></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+
+{{ end }}
+
+{{ template "templatemain.html" .}}

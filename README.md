@@ -45,18 +45,22 @@ services:
 ```
 
 ## Screenshots
-![Search](./static/img/search_demo.png)
-
 Search Interface
 
-![Card](./static/img/card_dog_kanji.png)
+![Search](./static/img/search_demo.png)
 
 See dependency tree for a card
 
-![Card](./static/img/card_bullet.png)
+![Card](./static/img/card_dog_kanji.png)
 
 Add custom dependencies to a card. "Sphere" was added as a dependency to "Bullet".
 
-![Srs](./static/img/srs_demo.gif)
+![Card](./static/img/card_bullet.png)
 
 SRS Interface
+
+![Srs Interface](./static/img/srs_demo.gif)
+
+Text Analysis - See how many words you know from a given text.
+
+![Text Analysis](./static/img/text_analysis.png)
