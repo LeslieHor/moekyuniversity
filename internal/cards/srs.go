@@ -85,6 +85,10 @@ func (c *Card) CorrectAnswer() {
 		return
 	}
 	
+	c.ProcessCorrectAnswer()
+}
+
+func (c *Card) ProcessCorrectAnswer() {
 	if c.LearningStage == Learning { // Learning stage
 		c.LearningInterval *= 2
 
@@ -132,6 +136,10 @@ func (c *Card) IncorrectAnswer() {
 		return
 	}
 
+	c.ProcessIncorrectAnswer()
+}
+
+func (c *Card) ProcessIncorrectAnswer() {
 	if c.LearningStage == Learning { // Learning stage
 		// Only affect the LearningInterval.
 		// The Interval is not affected, to preserve progress.

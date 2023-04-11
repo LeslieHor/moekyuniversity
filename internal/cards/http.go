@@ -12,6 +12,7 @@ import (
 	"os"
 	"fmt"
 	"strings"
+	"math/rand"
 
     "github.com/google/uuid"
 	"github.com/gorilla/mux"
@@ -58,6 +59,7 @@ func SetupRoutes(cd *CardData) {
 	r.HandleFunc("/cardoverview/bypartsofspeech", cd.OverviewByPartsOfSpeechHandler)
 	r.HandleFunc("/cardoverview/byreviewperformance", cd.OverviewByReviewPerformanceHandler)
 	r.HandleFunc("/cardoverview/bytag", cd.OverviewByTagHandler)
+	r.HandleFunc("/cardoverview/simulate/{correctRate}/{newCardsPerDay}", cd.OverviewSimulateHandler)
 	r.HandleFunc("/cardoverview/debug", cd.OverviewDebugHandler)
 	
 	r.HandleFunc("/textanalysis", cd.TextAnalysisHandler)
@@ -589,6 +591,115 @@ func (cd *CardData) OverviewByTagHandler(w http.ResponseWriter, r *http.Request)
 		lc := len(filterCardsByLearned(cs))
 		o := NewCardOverviewData(tag, cs, lc, true)
 		codl = append(codl, o)
+	}
+
+	cd.doTemplate(w, r, "cardoverview.html", codl)
+}
+
+func (cd *CardData) OverviewSimulateHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	correctRate := vars["correctRate"]
+	correctRateFloat, err := strconv.ParseFloat(correctRate, 64)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	newCardsPerDay := vars["newCardsPerDay"]
+	newCardsPerDayInt, err := strconv.Atoi(newCardsPerDay)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	codl := []CardOverviewData{}
+	cl := cd.ToList()
+	cl = filterCardsByLearned(cl)
+	cl = filterOutCardsByLearningStage(cl, Burned)
+
+	// Create a copy of the card list
+	for i, c := range cl {
+		if c == nil {
+			continue
+		}
+		v := *c
+		cl[i] = &v
+	}
+
+	// Begin with all cards due now
+	t := time.Now()
+
+	// Simulate the next 60 days
+	newCardCounter := 0
+	for i := 0; i < 60; i++ {
+		// Add new cards to the list
+		var nc []*Card
+		for j := 0; j < newCardsPerDayInt; j++ {
+			newCardCounter++
+			nc = append(nc, &Card{
+				ID: newCardCounter,
+				Characters: fmt.Sprintf("Card %d", newCardCounter),
+				Meanings: []Meaning{
+					Meaning{
+						Meaning: fmt.Sprintf("Card %d", newCardCounter),
+						Primary: true,
+						AcceptedAnswer: true,
+					},
+				},
+				Interval: 0,
+				LearningInterval: 3,
+				NextReviewDate: "1970-01-01T00:00:00Z",
+			})
+		}
+		cl = append(cl, nc...)
+
+		// Update all learning stages
+		for _, c := range cl {
+			// TODO: This is a hack to get the learning stage to update. I don't really want to use the real card data here.
+			c.UpdateLearningStage(cd)
+		}
+		
+		// Remove burned cards
+		cl = filterOutCardsByLearningStage(cl, Burned)
+		// Get the cards due today
+		cs := filterCardsByDueBefore(cl, t)
+		
+		// Fake review the cards
+		for _, c := range cs {
+			if rand.Float64() < correctRateFloat {
+				c.ProcessCorrectAnswer()
+			} else {
+				c.ProcessIncorrectAnswer()
+			}
+		}
+
+		// Add those cards we just reviewed to the overview
+		codl = append(codl, CardOverviewData{
+			Title: fmt.Sprintf("Day %d", i),
+			Cards: cs,
+			ShowLearnedCount: false,
+		})
+
+		// The calculated next review date is based on time.now(), so we need to fake it into the future.
+		// Get the time difference between now and the next review date and add on the t time., but if the time is in the past, don't change it, because it is an upnext learning card.
+		for _, c := range cs {
+			if c.NextReviewDate == "" {
+				// Burned cards don't have a next review date
+				continue
+			}
+			t1, err := time.Parse(time.RFC3339, c.NextReviewDate)
+			if err != nil {
+				panic(err)
+			}
+			t2 := time.Now()
+			if t1.Before(t2) {
+				continue
+			}
+			t3 := t1.Sub(t2)
+			c.NextReviewDate = t.Add(t3).Format(time.RFC3339)
+		}
+
+		// Move to the next day
+		t = t.Add(24 * time.Hour)
 	}
 
 	cd.doTemplate(w, r, "cardoverview.html", codl)
