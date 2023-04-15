@@ -3,3 +3,5 @@ _build/
 tools/docker/
 data/
 static/img/cards/
+.vscode/
+cmd/__debug_bin

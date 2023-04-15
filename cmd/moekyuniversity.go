@@ -24,11 +24,11 @@ func main() {
 
 	cardData := cards.CardData{
 		CardsFile: *cardsFile,
-		DataDir: *dataDir,
+		DataDir:   *dataDir,
 		BackupDir: *backupDir,
 		StaticDir: *staticDir,
 	}
 	cardData.LoadCardJson()
-
+	cardData.LoadDictionary()
 	cards.SetupRoutes(&cardData)
 }

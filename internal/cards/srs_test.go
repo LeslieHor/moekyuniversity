@@ -7,11 +7,11 @@ import (
 
 func TestCorrectUpNextToLearning(t *testing.T) {
 	c := Card{
-		ID: 1,
-		Interval: 0,
+		ID:               1,
+		Interval:         0,
 		LearningInterval: 0,
-		LearningStage: UpNext,
-		NextReviewDate: "1970-01-01T00:00:00Z", // 0 unix time
+		LearningStage:    UpNext,
+		NextReviewDate:   "1970-01-01T00:00:00Z", // 0 unix time
 	}
 
 	c.CorrectAnswer()
@@ -41,11 +41,11 @@ func TestCorrectUpNextToLearning(t *testing.T) {
 
 func TestCorrectLearningToLearning(t *testing.T) {
 	c := Card{
-		ID: 1,
-		Interval: 0,
+		ID:               1,
+		Interval:         0,
 		LearningInterval: 3, // 3 hours
-		LearningStage: 2,
-		NextReviewDate: "2020-01-01T00:00:00Z", // Any date in the past
+		LearningStage:    2,
+		NextReviewDate:   "2020-01-01T00:00:00Z", // Any date in the past
 	}
 
 	c.CorrectAnswer()
@@ -75,11 +75,11 @@ func TestCorrectLearningToLearning(t *testing.T) {
 
 func TestCorrectLearningToLearned(t *testing.T) {
 	c := Card{
-		ID: 1,
-		Interval: 0,
-	    LearningInterval: 12, // 12 hours
-		LearningStage: 2,
-		NextReviewDate: "2020-01-01T00:00:00Z", // Any date in the past
+		ID:               1,
+		Interval:         0,
+		LearningInterval: 12, // 12 hours
+		LearningStage:    2,
+		NextReviewDate:   "2020-01-01T00:00:00Z", // Any date in the past
 	}
 
 	c.CorrectAnswer()
@@ -109,11 +109,11 @@ func TestCorrectLearningToLearned(t *testing.T) {
 
 func TestCorrectLearnedToLearned(t *testing.T) {
 	c := Card{
-		ID: 1,
-		Interval: 48, // 2 days
+		ID:               1,
+		Interval:         48, // 2 days
 		LearningInterval: 0,
-		LearningStage: 3,
-		NextReviewDate: "2020-01-01T00:00:00Z", // Any date in the past
+		LearningStage:    3,
+		NextReviewDate:   "2020-01-01T00:00:00Z", // Any date in the past
 	}
 
 	c.CorrectAnswer()
@@ -143,15 +143,15 @@ func TestCorrectLearnedToLearned(t *testing.T) {
 
 func TestCorrectLearnedToBurned(t *testing.T) {
 	c := Card{
-		ID: 1,
-		Interval: 24 * 200, // 200 days
+		ID:               1,
+		Interval:         24 * 200, // 200 days
 		LearningInterval: 0,
-		LearningStage: 3,
-		NextReviewDate: "2020-01-01T00:00:00Z", // Any date in the past
+		LearningStage:    3,
+		NextReviewDate:   "2020-01-01T00:00:00Z", // Any date in the past
 	}
 
 	c.CorrectAnswer()
-	if c.Interval != 24 * 400 {
+	if c.Interval != 24*400 {
 		t.Errorf("Incorrect interval. Expected 24 * 400, got %d", c.Interval)
 	}
 	if c.LearningStage != 4 {
@@ -175,11 +175,11 @@ func TestCorrectLearnedToBurned(t *testing.T) {
 
 func TestIncorrectUpNextToUpNext(t *testing.T) {
 	c := Card{
-		ID: 1,
-		Interval: 0,
+		ID:               1,
+		Interval:         0,
 		LearningInterval: 0,
-		LearningStage: UpNext,
-		NextReviewDate: "1970-01-01T00:00:00Z", // Any date in the past
+		LearningStage:    UpNext,
+		NextReviewDate:   "1970-01-01T00:00:00Z", // Any date in the past
 	}
 
 	c.IncorrectAnswer()
@@ -210,13 +210,13 @@ func TestIncorrectUpNextToUpNext(t *testing.T) {
 
 func TestIncorrectLearningToLearningMinimum(t *testing.T) {
 	c := Card{
-		ID: 1,
-		Interval: 0,
-		LearningInterval: 3, // 3 hours
-		LearningStage: 2,
-		NextReviewDate: "2020-01-01T00:00:00Z", // Any date in the past
+		ID:                 1,
+		Interval:           0,
+		LearningInterval:   3, // 3 hours
+		LearningStage:      2,
+		NextReviewDate:     "2020-01-01T00:00:00Z", // Any date in the past
 		TotalTimesReviewed: 5,
-		TotalTimesCorrect: 3,
+		TotalTimesCorrect:  3,
 	}
 
 	c.IncorrectAnswer()
@@ -247,13 +247,13 @@ func TestIncorrectLearningToLearningMinimum(t *testing.T) {
 
 func TestIncorrectLearningToLearning(t *testing.T) {
 	c := Card{
-		ID: 1,
-		Interval: 0,
-		LearningInterval: 12, // 12 hours
-		LearningStage: 2,
-		NextReviewDate: "2020-01-01T00:00:00Z", // Any date in the past
+		ID:                 1,
+		Interval:           0,
+		LearningInterval:   12, // 12 hours
+		LearningStage:      2,
+		NextReviewDate:     "2020-01-01T00:00:00Z", // Any date in the past
 		TotalTimesReviewed: 5,
-		TotalTimesCorrect: 3,
+		TotalTimesCorrect:  3,
 	}
 
 	c.IncorrectAnswer()
@@ -285,13 +285,13 @@ func TestIncorrectLearningToLearning(t *testing.T) {
 
 func TestIncorrectLearnedToLearning(t *testing.T) {
 	c := Card{
-		ID: 1,
-		Interval: 240, // 10 days
-		LearningInterval: 0,
-		LearningStage: 3,
-		NextReviewDate: "2020-01-01T00:00:00Z", // Any date in the past
+		ID:                 1,
+		Interval:           240, // 10 days
+		LearningInterval:   0,
+		LearningStage:      3,
+		NextReviewDate:     "2020-01-01T00:00:00Z", // Any date in the past
 		TotalTimesReviewed: 5,
-		TotalTimesCorrect: 3,
+		TotalTimesCorrect:  3,
 	}
 
 	c.IncorrectAnswer()
@@ -352,11 +352,11 @@ func TestIncorrectLearnedToLearning(t *testing.T) {
 
 func TestCorrectRelearningToRelearning(t *testing.T) {
 	c := Card{
-		ID: 1,
-		Interval: 120, // 5 days
-		LearningInterval: 3, // 3 hours
-		LearningStage: 2,
-		NextReviewDate: "2020-01-01T00:00:00Z", // Any date in the past
+		ID:               1,
+		Interval:         120, // 5 days
+		LearningInterval: 3,   // 3 hours
+		LearningStage:    2,
+		NextReviewDate:   "2020-01-01T00:00:00Z", // Any date in the past
 	}
 
 	c.CorrectAnswer()
@@ -393,11 +393,11 @@ func TestCorrectRelearningToRelearning(t *testing.T) {
 
 func TestCorrectRelearningToLearned(t *testing.T) {
 	c := Card{
-		ID: 1,
-		Interval: 120, // 5 days
-		LearningInterval: 16, // 16 hours
-		LearningStage: 2,
-		NextReviewDate: "2020-01-01T00:00:00Z", // Any date in the past
+		ID:               1,
+		Interval:         120, // 5 days
+		LearningInterval: 16,  // 16 hours
+		LearningStage:    2,
+		NextReviewDate:   "2020-01-01T00:00:00Z", // Any date in the past
 	}
 
 	c.CorrectAnswer()
@@ -504,7 +504,7 @@ func TestNextSrsUpNext(t *testing.T) {
 	c4 := &Card{ID: 4, LearningStage: UpNext, NextReviewDate: "1970-01-01T00:00:00Z"}
 	c5 := &Card{ID: 5, LearningStage: UpNext, NextReviewDate: "1970-01-01T00:00:00Z"}
 	c6 := &Card{ID: 6, LearningStage: UpNext, NextReviewDate: "1970-01-01T00:00:00Z"}
-	
+
 	cd := CreateCardDataFromSlice([]*Card{c1, c2, c3, c4, c5, c6})
 
 	cd.AddUpNextCards(5)
@@ -581,7 +581,7 @@ func TestAutoUpNextMultipleDependencies(t *testing.T) {
 	if c3.LearningStage != Unavailable {
 		t.Errorf("Incorrect card stage. Expected %d, got %d", Unavailable, c3.LearningStage)
 	}
-	
+
 	// Set c3 to queued to learn
 	c3.SetQueuedToLearn(cd)
 	cd.UpdateCardData()
@@ -687,7 +687,7 @@ func TestUpNextCards(t *testing.T) {
 	unc[2].CorrectAnswer()
 
 	cd.UpdateCardData()
-	
+
 	// There should be 2 upnext cards
 	unc = cd.GetUpNextCards()
 	if len(unc) != 2 {

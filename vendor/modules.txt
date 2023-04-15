@@ -1,3 +1,5 @@
+# foosoft.net/projects/jmdict v0.0.0-20220714211640-cc9bc30b68a3
+foosoft.net/projects/jmdict
 # github.com/google/uuid v1.3.0
 github.com/google/uuid
 # github.com/gorilla/mux v1.8.0
@@ -10,3 +12,5 @@ github.com/ikawaha/kagome-dict/ipa
 # github.com/ikawaha/kagome/v2 v2.9.2
 github.com/ikawaha/kagome/v2/tokenizer
 github.com/ikawaha/kagome/v2/tokenizer/lattice
+# github.com/mochi-co/kana-tools v1.1.0
+github.com/mochi-co/kana-tools

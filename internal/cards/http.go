@@ -1,20 +1,20 @@
 package cards
 
 import (
-	"net/http"
-	"html/template"
-	"strconv"
 	"encoding/json"
-	"time"
-	"log"
-	"path/filepath"
-	"io/ioutil"
-	"os"
 	"fmt"
-	"strings"
+	"html/template"
+	"io/ioutil"
+	"log"
 	"math/rand"
+	"net/http"
+	"os"
+	"path/filepath"
+	"strconv"
+	"strings"
+	"time"
 
-    "github.com/google/uuid"
+	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 )
 
@@ -22,7 +22,7 @@ func SetupRoutes(cd *CardData) {
 	cd.SetupFuncMap()
 
 	log.Printf("Data dir: %s", cd.DataDir)
-	
+
 	r := mux.NewRouter()
 
 	r.HandleFunc("/", cd.IndexHandler)
@@ -34,7 +34,7 @@ func SetupRoutes(cd *CardData) {
 		http.ServeFile(w, r, "static/img/icon.png")
 	})
 	r.PathPrefix("/img/").Handler(http.FileServer(http.Dir(cd.StaticDir)))
-	
+
 	// Strip the /data prefix from the path and serve the file from the data directory
 	r.PathPrefix("/data/").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, filepath.Join(cd.DataDir, r.URL.Path[6:]))
@@ -61,7 +61,7 @@ func SetupRoutes(cd *CardData) {
 	r.HandleFunc("/cardoverview/bytag", cd.OverviewByTagHandler)
 	r.HandleFunc("/cardoverview/simulate/{correctRate}/{newCardsPerDay}", cd.OverviewSimulateHandler)
 	r.HandleFunc("/cardoverview/debug", cd.OverviewDebugHandler)
-	
+
 	r.HandleFunc("/textanalysis", cd.TextAnalysisHandler)
 	r.HandleFunc("/textanalysis/new", cd.TextAnalysisNewHandler)
 	r.HandleFunc("/textanalysis/new/submit", cd.TextAnalysisNewSubmitHandler)
@@ -110,7 +110,6 @@ func (cd *CardData) SetupFuncMap() {
 	}
 	cd.FuncMap = funcMap
 }
-
 
 func (cd *CardData) doTemplate(w http.ResponseWriter, r *http.Request, templateName string, data interface{}) {
 	htmlDir := filepath.Join(cd.StaticDir, "html")
@@ -186,13 +185,13 @@ func (cd *CardData) CardJsonHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 type CardEditData struct {
-	CardDataTree CardDataTree
-	LearningStages []struct{
+	CardDataTree   CardDataTree
+	LearningStages []struct {
 		Value LearningStage
-		Text string
+		Text  string
 	}
-	PartsOfSpeech []struct{
-		Text string
+	PartsOfSpeech []struct {
+		Text     string
 		Selected bool
 	}
 	SuggestedComponents []*Card
@@ -211,7 +210,7 @@ func (cd *CardData) CardJsonEditHandler(w http.ResponseWriter, r *http.Request) 
 	suggestedComponents = removeCard(suggestedComponents, c)
 
 	editData := CardEditData{
-		CardDataTree: dt,
+		CardDataTree:        dt,
 		SuggestedComponents: suggestedComponents,
 	}
 
@@ -313,25 +312,25 @@ func (cd *CardData) CardCharacterImageUploadHandler(w http.ResponseWriter, r *ht
 
 func (cd *CardData) CardNewHandler(w http.ResponseWriter, r *http.Request) {
 	m := Meaning{
-		Meaning: "Placeholder meaning",
-		Primary: true,
+		Meaning:        "Placeholder meaning",
+		Primary:        true,
 		AcceptedAnswer: true,
 	}
 	r1 := Reading{
-		Reading: "Placeholder reading",
-		Type: "onyomi",
-		Primary: true,
+		Reading:        "Placeholder reading",
+		Type:           "onyomi",
+		Primary:        true,
 		AcceptedAnswer: true,
 	}
 	r2 := Reading{
-		Reading: "Placeholder reading",
-		Type: "kunyomi",
-		Primary: false,
+		Reading:        "Placeholder reading",
+		Type:           "kunyomi",
+		Primary:        false,
 		AcceptedAnswer: false,
 	}
 
 	c := Card{
-		ID: cd.GetNewCardId(),
+		ID:       cd.GetNewCardId(),
 		Meanings: []Meaning{m},
 		Readings: []Reading{r1, r2},
 	}
@@ -368,7 +367,7 @@ func (cd *CardData) CardTagSuspendedHandler(w http.ResponseWriter, r *http.Reque
 		panic(err)
 	}
 	log.Printf("Tagging card %d as suspended", id)
-	
+
 	c := cd.GetCard(id)
 	c.TagSuspended()
 	cd.UpdateCardData()
@@ -389,7 +388,7 @@ func (cd *CardData) CardAddToQueueHandler(w http.ResponseWriter, r *http.Request
 
 	// Check that the card is available or unavailable
 	c := cd.GetCard(id)
-	if ! c.IsQueueable() {
+	if !c.IsQueueable() {
 		log.Printf("Card %d is not queuable", id)
 		w.WriteHeader(http.StatusBadRequest)
 		return
@@ -405,28 +404,30 @@ func (cd *CardData) CardAddToQueueHandler(w http.ResponseWriter, r *http.Request
 }
 
 type CardOverviewData struct {
-	Title string
-	Cards []*Card
-	LearnedCount int
+	Title            string
+	Cards            []*Card
+	LearnedCount     int
 	ShowLearnedCount bool
 }
 
 func NewCardOverviewData(title string, cards []*Card, learnedCount int, showLearnedCount bool) CardOverviewData {
 	return CardOverviewData{
-		Title: title,
-		Cards: cards,
-		LearnedCount: learnedCount,
+		Title:            title,
+		Cards:            cards,
+		LearnedCount:     learnedCount,
 		ShowLearnedCount: showLearnedCount,
 	}
 }
 
-func filterCards(cards []Card, filters ...func([]Card) []Card) []Card {
-	for _, f := range filters {
-		cards = f(cards)
-	}
+// Currently unused
+// Filter a list of cards by the given functions
+// func filterCards(cards []Card, filters ...func([]Card) []Card) []Card {
+// 	for _, f := range filters {
+// 		cards = f(cards)
+// 	}
 
-	return cards
-}
+// 	return cards
+// }
 
 func getOverviewLearningStage(cards []*Card, ls LearningStage) CardOverviewData {
 	cs := filterCardsByLearningStage(cards, ls)
@@ -446,7 +447,7 @@ func (cd *CardData) OverviewByLearningStageHandler(w http.ResponseWriter, r *htt
 	codl = append(codl, getOverviewLearningStage(cl, Learning))
 	codl = append(codl, getOverviewLearningStage(cl, Learned))
 	codl = append(codl, getOverviewLearningStage(cl, Burned))
-	
+
 	cd.doTemplate(w, r, "cardoverview.html", codl)
 }
 
@@ -458,7 +459,7 @@ func (cd *CardData) OverviewByLevelHandler(w http.ResponseWriter, r *http.Reques
 		cs := filterCardsByLevel(cl, i)
 		cs = sortCardsById(cs)
 		lc := len(filterCardsByLearned(cs))
-		o := NewCardOverviewData("Level " + strconv.Itoa(i), cs, lc, true)
+		o := NewCardOverviewData("Level "+strconv.Itoa(i), cs, lc, true)
 		codl = append(codl, o)
 	}
 
@@ -478,28 +479,28 @@ func (cd *CardData) OverviewByDueHandler(w http.ResponseWriter, r *http.Request)
 	codl = append(codl, o)
 
 	// Due in the next 24 hours
-	cs = filterCardsByDueBetween(cl, time.Now(), time.Now().Add(24 * time.Hour))
+	cs = filterCardsByDueBetween(cl, time.Now(), time.Now().Add(24*time.Hour))
 	cs = filterOutCardsByTag(cs, "suspended")
 	cs = sortCardsByDue(cs)
 	o = NewCardOverviewData("Due in the next 24 hours", cs, 0, false)
 	codl = append(codl, o)
 
 	// Due in the next 7 days
-	cs = filterCardsByDueBetween(cl, time.Now().Add(24 * time.Hour), time.Now().Add(7 * 24 * time.Hour))
+	cs = filterCardsByDueBetween(cl, time.Now().Add(24*time.Hour), time.Now().Add(7*24*time.Hour))
 	cs = filterOutCardsByTag(cs, "suspended")
 	cs = sortCardsByDue(cs)
 	o = NewCardOverviewData("Due in the next week", cs, 0, false)
 	codl = append(codl, o)
 
 	// Due in the next 30 days
-	cs = filterCardsByDueBetween(cl, time.Now().Add(7 * 24 * time.Hour), time.Now().Add(30 * 24 * time.Hour))
+	cs = filterCardsByDueBetween(cl, time.Now().Add(7*24*time.Hour), time.Now().Add(30*24*time.Hour))
 	cs = filterOutCardsByTag(cs, "suspended")
 	cs = sortCardsByDue(cs)
 	o = NewCardOverviewData("Due in the next month", cs, 0, false)
 	codl = append(codl, o)
 
 	// Due in the next 365 days
-	cs = filterCardsByDueBetween(cl, time.Now().Add(30 * 24 * time.Hour), time.Now().Add(365 * 24 * time.Hour))
+	cs = filterCardsByDueBetween(cl, time.Now().Add(30*24*time.Hour), time.Now().Add(365*24*time.Hour))
 	cs = filterOutCardsByTag(cs, "suspended")
 	cs = sortCardsByDue(cs)
 	o = NewCardOverviewData("Due in the next year", cs, 0, false)
@@ -636,18 +637,18 @@ func (cd *CardData) OverviewSimulateHandler(w http.ResponseWriter, r *http.Reque
 		for j := 0; j < newCardsPerDayInt; j++ {
 			newCardCounter++
 			nc = append(nc, &Card{
-				ID: newCardCounter,
+				ID:         newCardCounter,
 				Characters: fmt.Sprintf("Card %d", newCardCounter),
 				Meanings: []Meaning{
-					Meaning{
-						Meaning: fmt.Sprintf("Card %d", newCardCounter),
-						Primary: true,
+					{
+						Meaning:        fmt.Sprintf("Card %d", newCardCounter),
+						Primary:        true,
 						AcceptedAnswer: true,
 					},
 				},
-				Interval: 0,
+				Interval:         0,
 				LearningInterval: 3,
-				NextReviewDate: "1970-01-01T00:00:00Z",
+				NextReviewDate:   "1970-01-01T00:00:00Z",
 			})
 		}
 		cl = append(cl, nc...)
@@ -657,12 +658,12 @@ func (cd *CardData) OverviewSimulateHandler(w http.ResponseWriter, r *http.Reque
 			// TODO: This is a hack to get the learning stage to update. I don't really want to use the real card data here.
 			c.UpdateLearningStage(cd)
 		}
-		
+
 		// Remove burned cards
 		cl = filterOutCardsByLearningStage(cl, Burned)
 		// Get the cards due today
 		cs := filterCardsByDueBefore(cl, t)
-		
+
 		// Fake review the cards
 		for _, c := range cs {
 			if rand.Float64() < correctRateFloat {
@@ -674,8 +675,8 @@ func (cd *CardData) OverviewSimulateHandler(w http.ResponseWriter, r *http.Reque
 
 		// Add those cards we just reviewed to the overview
 		codl = append(codl, CardOverviewData{
-			Title: fmt.Sprintf("Day %d", i),
-			Cards: cs,
+			Title:            fmt.Sprintf("Day %d", i),
+			Cards:            cs,
 			ShowLearnedCount: false,
 		})
 
@@ -774,8 +775,7 @@ func (cd *CardData) TextAnalysisIdHandler(w http.ResponseWriter, r *http.Request
 	if err != nil {
 		log.Fatal(err)
 	}
-	ta.Analyse()
-	cd.AddLearningStages(&ta)
+	ta.Analyse(cd)
 
 	// Replace newlines with <br>
 	htmlText := strings.Replace(ta.Text, "\r\n", "<br>", -1)
@@ -837,7 +837,7 @@ func (cd *CardData) TextAnalysisIdDeleteHandler(w http.ResponseWriter, r *http.R
 
 func (cd *CardData) SearchHandler(w http.ResponseWriter, r *http.Request) {
 	var pageData struct {
-		SearchTerm string
+		SearchTerm    string
 		SearchResults []*Card
 	}
 	// Get search query "q"
@@ -881,19 +881,19 @@ func (cd *CardData) SrsCorrectHandler(w http.ResponseWriter, r *http.Request) {
 		log.Printf("Card %d changed from %s to %s", cardId, prevState, currentState)
 		s := cd.GetNextSrsCard()
 		pageData := struct {
-			Card *Card
-			DueCount int
+			Card          *Card
+			DueCount      int
 			LearningCount int
 		}{
-			Card: c,
-			DueCount: s.DueCount,
+			Card:          c,
+			DueCount:      s.DueCount,
 			LearningCount: s.LearningCount,
 		}
 
 		cd.doTemplate(w, r, "congratulationssrs.html", pageData)
 		return
 	}
-	
+
 	http.Redirect(w, r, "/srs", http.StatusFound)
 }
 
@@ -911,7 +911,7 @@ func (cd *CardData) SrsIncorrectHandler(w http.ResponseWriter, r *http.Request) 
 
 	cd.UpdateCardData()
 	cd.SaveCardMap()
-	
+
 	http.Redirect(w, r, "/srs", http.StatusFound)
 }
 
@@ -925,6 +925,6 @@ func (cd *CardData) SrsAddUpNextCardsHandler(w http.ResponseWriter, r *http.Requ
 
 	log.Printf("Adding %d cards to up next", n)
 	cd.AddUpNextCards(n)
-	
+
 	http.Redirect(w, r, "/srs", http.StatusFound)
 }

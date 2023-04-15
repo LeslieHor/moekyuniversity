@@ -1,6 +1,43 @@
 {{ define "windowtitle" }}Text Analysis - {{.TextAnalysis.Name}}{{ end }}
 {{ define "title" }}{{.TextAnalysis.Name}}{{ end }}
 
+{{ define "dictionaryentry" }}
+<div class="dictionary-entry">
+    {{if .Expressions}}
+    <div class="dictionary-expressions">{{range $index, $element := .Expressions}}{{if $index}};
+        {{end}}{{$element}}{{end}}</div>
+    {{else}}
+    <div class="dictionary-expressions">{{range $index, $element := .Readings}}{{if $index}};
+        {{end}}{{$element}}{{end}}</div>
+    {{end}}
+    <div class="dictionary-readings">Readings:{{range $index, $element := .Readings}}{{if $index}};
+        {{end}}{{$element}}{{end}}</div>
+    {{range .Definitions}}
+    <div class="dictionary-parts-of-speech">{{range $index, $element := .PartsOfSpeech}}{{if $index}};
+        {{end}}{{$element}}{{end}}</div>
+    <div class="dictionary-definitions">{{range $index, $element := .Definitions}}{{if $index}};
+        {{end}}{{$element}}{{end}}</div>
+    {{end}}
+</div>
+{{ end }}
+
+{{ define "cardTooltip" }}
+<div class="card-tooltip">
+    <div class="card-characters">{{.Characters}}</div>
+    <div class="card-parts-of-speech">{{range $index, $element := .PartsOfSpeech}}{{if $index}};
+        {{end}}{{$element}}{{end}}</div>
+    <div class="card-meanings">{{range $index, $element := .Meanings}}{{if $index}}; {{end}}{{$element.Meaning}}{{end}}
+    </div>
+</div>
+{{ end }}
+
+{{ define "dictionary-text" }}<span class="ta-token token-missing"><span class="definition-tooltip">{{ newlinetohtml .Surface}}<span class="definition-tooltiptext">{{ range .DictionaryEntries }}{{ template "dictionaryentry" . }}{{ end }}</span></span></span>{{ end }}
+
+{{ define "card-text" }}<span class="ta-token stage-{{ stripspaces .Card.LearningStageString }}"><span class="definition-tooltip"><a class="a-none" href="/card/{{.CardId}}">{{ newlinetohtml .Surface}}</a><span class="definition-tooltiptext">{{template "cardTooltip" .Card}}</span></span></span>{{ end }}
+
+{{ define "none-text" }}<span class="ta-token token-none">{{ newlinetohtml .Surface}}</span>{{ end }}
+
+
 {{ define "content" }}
 
 <div class="links">
@@ -9,7 +46,8 @@
 
 <hr>
 
-<div>Non highlighted text is not in the card database. This could include particles, words written in hiragana but exist as kanji in the cards, words that don't exist in the card database at all and need to be added.</div>
+<div>Non highlighted text is not in the card database. This could include particles, words written in hiragana but exist
+    as kanji in the cards, words that don't exist in the card database at all and need to be added.</div>
 
 <div class="section">
     <div class="heading">Key</div>
@@ -20,6 +58,7 @@
     <span class="stage-Learning">Learning</span>
     <span class="stage-Learned">Learned</span>
     <span class="stage-Burned">Burned</span>
+    <span class="token-missing">Missing Card</span>
 </div>
 
 <div class="section">
@@ -28,8 +67,7 @@
             <span class="heading">Analysed Text</span>
         </summary>
         <div class="ta-analysed-text">
-            {{ range $index, $element := .TextAnalysis.Tokens }}<span
-                class="ta-token stage-{{ stripspaces $element.LearningStageString }}"><span class="tooltip">{{if $element.CardId }}<a class="a-none" href="/card/{{.CardId}}">{{ newlinetohtml $element.Surface}}</a>{{else}}{{ newlinetohtml $element.Surface}}{{end}}<span class="tooltiptext">{{$element.BaseForm}}</span></span></span>{{end}}
+            {{ range .TextAnalysis.Tokens }}{{if .Card}}{{template "card-text" . }}{{ else if .DictionaryEntries}}{{template "dictionary-text" .}}{{else}}{{template "none-text" .}}{{end}}{{end}}
         </div>
     </details>
 </div>
@@ -48,15 +86,20 @@
         <summary>
             <span class="heading">Tokens</span>
         </summary>
-        {{ range $index, $element := .TextAnalysis.Tokens }}
+        {{ range .TextAnalysis.Tokens }}
         <hr>
         <div>
-            <div>Surface: {{$element.Surface}}</div>
-            <div>Base Form: {{$element.BaseForm}}</div>
-            <div>Part of Speech: {{$element.POS}}</div>
-            <div>Pronunciation: {{$element.Pronunciation}}</div>
-            <div>Learning Stage: {{$element.LearningStage}}</div>
-            <div>Learning Stage String: {{$element.LearningStageString}}</div>
+            <div>Surface: {{.Surface}}</div>
+            <div>Base Form: {{.BaseForm}}</div>
+            <div>Part of Speech: {{.PartsOfSpeech}}</div>
+            <div>Pronunciation: {{.Pronunciation}}</div>
+            <div>Learning Stage: {{.LearningStage}}</div>
+            <div>Learning Stage String: {{.LearningStageString}}</div>
+            <div>
+                {{ range .DictionaryEntries }}
+                {{ template "dictionaryentry" . }}
+                {{ end }}
+            </div>
         </div>
         {{ end }}
     </details>

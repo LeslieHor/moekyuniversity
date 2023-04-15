@@ -16,10 +16,10 @@ func CreateCardDataFromSlice(cards []*Card) *CardData {
 
 func CreateCard(id int, interval int, learningInterval int, NextReviewDate string) *Card {
 	return &Card{
-		ID: id,
-		Interval: interval,
+		ID:               id,
+		Interval:         interval,
 		LearningInterval: learningInterval,
-		NextReviewDate: NextReviewDate,
+		NextReviewDate:   NextReviewDate,
 	}
 }
 
@@ -73,7 +73,7 @@ func TestCardUpNext(t *testing.T) {
 
 func TestCardAvailable(t *testing.T) {
 	c1 := CreateCard(1, 9600, 0, "2020-01-01T00:00:00Z") // Burned card
-	c2 := CreateCard(2, 48, 0, "2020-01-01T00:00:00Z") // Learned card
+	c2 := CreateCard(2, 48, 0, "2020-01-01T00:00:00Z")   // Learned card
 	c := CreateCard(3, 0, 0, "")
 	c.ComponentSubjectIDs = []int{1, 2}
 	cd := CreateCardDataFromSlice([]*Card{c1, c2, c})
@@ -88,7 +88,7 @@ func TestCardAvailable(t *testing.T) {
 
 func TestCardUnavailable(t *testing.T) {
 	c1 := CreateCard(1, 48, 0, "2020-01-01T00:00:00Z") // Learned card
-	c2 := CreateCard(2, 3, 0, "2020-01-01T00:00:00Z") // Learning card
+	c2 := CreateCard(2, 3, 0, "2020-01-01T00:00:00Z")  // Learning card
 	c := CreateCard(3, 0, 0, "")
 	c.ComponentSubjectIDs = []int{1, 2}
 	cd := CreateCardDataFromSlice([]*Card{c1, c2, c})
