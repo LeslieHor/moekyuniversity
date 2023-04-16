@@ -1,5 +1,9 @@
 # Change Log
 
+## 0.2.6 - 2023-04-16
+### Fix bug with links in dictionary entries
+When a dictionary entry had no kanji, and only showed the reading, the link to the dictionary entry would not work.
+
 ## 0.2.5 - 2023-04-16
 ### Add Simulate Page Link
 Simulation page was previously only accessible directly via the URL. Now there is a link to it on the home page, as well as inputs for the recall rate and number of new cards per day to simulate.
