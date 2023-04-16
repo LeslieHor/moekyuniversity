@@ -33,7 +33,7 @@
 
 {{ define "dictionary-text" }}<span class="ta-token token-missing"><span class="definition-tooltip">{{ newlinetohtml .Surface}}<span class="definition-tooltiptext">{{ range .DictionaryEntries }}{{ template "dictionaryentry" . }}{{ end }}</span></span></span>{{ end }}
 
-{{ define "card-text" }}<span class="ta-token stage-{{ stripspaces .Card.LearningStageString }}"><span class="definition-tooltip"><a class="a-none" href="/card/{{.CardId}}">{{ newlinetohtml .Surface}}</a><span class="definition-tooltiptext">{{template "cardTooltip" .Card}}</span></span></span>{{ end }}
+{{ define "card-text" }}<span class="ta-token stage-{{ stripspaces .Card.LearningStageString }}"><span class="definition-tooltip"><a class="a-none" href="/card/{{.Card.ID}}">{{ newlinetohtml .Surface}}</a><span class="definition-tooltiptext">{{template "cardTooltip" .Card}}</span></span></span>{{ end }}
 
 {{ define "none-text" }}<span class="ta-token token-none">{{ newlinetohtml .Surface}}</span>{{ end }}
 

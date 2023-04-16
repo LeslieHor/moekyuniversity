@@ -67,7 +67,7 @@ type Card struct {
 	Tags []string `json:"tags"`
 
 	// Below is for html output
-	LearningStageString string `json:"learning_stage_string"` // Unavailable, Available, Learning, Learned, Burned
+	LearningStageString string `json:"-"` // Unavailable, Available, Learning, Learned, Burned
 }
 
 func (c *Card) UpdateLearningStage(cd *CardData) {
