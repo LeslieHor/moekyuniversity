@@ -1,5 +1,9 @@
 # Change Log
 
+## 0.2.4 - 2023-04-16
+### Existing Cards Show on Dictionary Entry
+When viewing a dictionary entry, you can see if there are any cards that already exist for that dictionary entry.
+
 ## 0.2.3 - 2023-04-16
 ### Add New Cards from Dictionary Entry
 When viewing a dictionary entry, you can add a new card pre-populated with the dictionary entry's information.

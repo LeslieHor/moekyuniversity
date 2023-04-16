@@ -14,7 +14,15 @@
     <div class="dictionary-expressions">{{range $index, $element := .Readings}}{{if $index}};
         {{end}}{{$element}}{{end}}</div>
     {{end}}
-    <div class="dict-options"><a href="/adddictionaryascard/{{.ID}}">Add as card</a></div>
+    {{ if .MatchingCards }}
+    <div class="heading">Existing Cards</div>
+    <div class="flow">
+        {{ range .MatchingCards }}
+        <a href="/card/{{.ID}}"><div class="dict-matching-card">{{.Characters}}</div></a>
+        {{ end }}
+    </div>
+    {{ end }}
+    <div class="dict-options"><a href="/adddictionaryascard/{{.ID}}">Add as new card</a></div>
     <div class="dictionary-readings">Readings:{{range $index, $element := .Readings}}{{if $index}};
         {{end}}{{$element}}{{end}}</div>
     {{range .Definitions}}

@@ -11,11 +11,12 @@ import (
 )
 
 type DictionaryEntry struct {
-	ID          int
-	Expressions []string // Word in kanji
-	Readings    []string // Pronunciations in hiragana
-	Definitions []DictionaryDefinition
-	JmdictEntry jmdict.JmdictEntry // The original JMdict entry
+	ID            int
+	Expressions   []string // Word in kanji
+	Readings      []string // Pronunciations in hiragana
+	Definitions   []DictionaryDefinition
+	MatchingCards []*Card
+	JmdictEntry   jmdict.JmdictEntry // The original JMdict entry
 }
 
 type DictionaryDefinition struct {
@@ -98,7 +99,7 @@ func (t *Token) AddDictionaryEntry(cd *CardData) {
 	if len(matches) > 0 {
 		var convertedEntries []DictionaryEntry
 		for _, entry := range matches {
-			convertedEntries = append(convertedEntries, convertJmdictEntryToDictionaryEntry(*entry))
+			convertedEntries = append(convertedEntries, convertJmdictEntryToDictionaryEntry(cd, *entry))
 		}
 		t.DictionaryEntries = append(t.DictionaryEntries, convertedEntries...)
 	}
@@ -108,7 +109,7 @@ func (t *Token) AddDictionaryEntry(cd *CardData) {
 	if len(matches) > 0 {
 		var convertedEntries []DictionaryEntry
 		for _, entry := range matches {
-			convertedEntries = append(convertedEntries, convertJmdictEntryToDictionaryEntry(*entry))
+			convertedEntries = append(convertedEntries, convertJmdictEntryToDictionaryEntry(cd, *entry))
 		}
 		t.DictionaryEntries = append(t.DictionaryEntries, convertedEntries...)
 	}
@@ -125,7 +126,7 @@ func (t *Token) AddDictionaryEntry(cd *CardData) {
 	if len(matches) > 0 {
 		var convertedEntries []DictionaryEntry
 		for _, entry := range matches {
-			convertedEntries = append(convertedEntries, convertJmdictEntryToDictionaryEntry(*entry))
+			convertedEntries = append(convertedEntries, convertJmdictEntryToDictionaryEntry(cd, *entry))
 		}
 		t.DictionaryEntries = append(t.DictionaryEntries, convertedEntries...)
 		return
@@ -150,19 +151,19 @@ func SearchDictionary(cd *CardData, query string) DictionarySearchData {
 	var result []DictionaryEntry
 
 	// Search on the whole query before searching on the tokenized parts
-	result = append(result, GetDictionaryEntries(query, cd.DictionaryKanjiMap)...)
-	result = append(result, GetDictionaryEntries(query, cd.DictionaryNonKanjiReadingMap)...)
-	result = append(result, GetDictionaryEntries(query, cd.DictionaryReadingMap)...)
+	result = append(result, GetDictionaryEntries(query, cd, cd.DictionaryKanjiMap)...)
+	result = append(result, GetDictionaryEntries(query, cd, cd.DictionaryNonKanjiReadingMap)...)
+	result = append(result, GetDictionaryEntries(query, cd, cd.DictionaryReadingMap)...)
 
 	// Search on the original query to search English meanings
-	result = append(result, GetDictionaryEntries(originalQuery, cd.DictionaryMeaningMap)...)
+	result = append(result, GetDictionaryEntries(originalQuery, cd, cd.DictionaryMeaningMap)...)
 
 	var tokenStrings []string
 	for _, token := range tokens {
 		to := ConvertToken(token)
-		result = append(result, GetDictionaryEntries(to.BaseForm, cd.DictionaryKanjiMap)...)
-		result = append(result, GetDictionaryEntries(to.BaseForm, cd.DictionaryNonKanjiReadingMap)...)
-		result = append(result, GetDictionaryEntries(to.Pronunciation, cd.DictionaryReadingMap)...)
+		result = append(result, GetDictionaryEntries(to.BaseForm, cd, cd.DictionaryKanjiMap)...)
+		result = append(result, GetDictionaryEntries(to.BaseForm, cd, cd.DictionaryNonKanjiReadingMap)...)
+		result = append(result, GetDictionaryEntries(to.Pronunciation, cd, cd.DictionaryReadingMap)...)
 		if to.BaseForm != "" {
 			tokenStrings = append(tokenStrings, to.BaseForm)
 		}
@@ -185,31 +186,42 @@ func SearchDictionary(cd *CardData, query string) DictionarySearchData {
 	}
 }
 
-func GetDictionaryEntries(term string, dict map[string][]*jmdict.JmdictEntry) []DictionaryEntry {
+func GetDictionaryEntries(term string, cd *CardData, dict map[string][]*jmdict.JmdictEntry) []DictionaryEntry {
 	var result []DictionaryEntry
 
 	entries := dict[term]
 	for _, entry := range entries {
-		result = append(result, convertJmdictEntryToDictionaryEntry(*entry))
+		result = append(result, convertJmdictEntryToDictionaryEntry(cd, *entry))
 	}
 
 	return result
 }
 
 // Convert a JMdict entry to a dictionary entry for ease of use
-func convertJmdictEntryToDictionaryEntry(entry jmdict.JmdictEntry) DictionaryEntry {
+func convertJmdictEntryToDictionaryEntry(cd *CardData, entry jmdict.JmdictEntry) DictionaryEntry {
 	var de DictionaryEntry
 
 	de.JmdictEntry = entry
-
 	de.ID = entry.Sequence
 
+	var matchingCardIds []int
+	var matchingCards []*Card
 	for _, kanji := range entry.Kanji {
 		de.Expressions = append(de.Expressions, kanji.Expression)
+		c := cd.FindVocabulary(kanji.Expression)
+		if c != nil && !containsInt(matchingCardIds, c.ID) {
+			matchingCardIds = append(matchingCardIds, c.ID)
+			matchingCards = append(matchingCards, c)
+		}
 	}
 
 	for _, reading := range entry.Readings {
 		de.Readings = append(de.Readings, reading.Reading)
+		c := cd.FindVocabulary(reading.Reading)
+		if c != nil && !containsInt(matchingCardIds, c.ID) {
+			matchingCardIds = append(matchingCardIds, c.ID)
+			matchingCards = append(matchingCards, c)
+		}
 	}
 
 	for _, sense := range entry.Sense {
@@ -223,6 +235,8 @@ func convertJmdictEntryToDictionaryEntry(entry jmdict.JmdictEntry) DictionaryEnt
 
 		de.Definitions = append(de.Definitions, dd)
 	}
+
+	de.MatchingCards = matchingCards
 
 	return de
 }

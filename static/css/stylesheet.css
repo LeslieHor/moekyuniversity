@@ -557,3 +557,11 @@ a {
     border-radius: 0.5em;
     background-color: rgb(75, 75, 75);
 }
+
+
+.dict-matching-card {
+    margin: 0.2em 0.2em;
+    padding: 0.2em;
+    border-radius: 0.5em;
+    background-color: rgb(75, 75, 75);
+}

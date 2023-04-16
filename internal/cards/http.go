@@ -909,7 +909,7 @@ func (cd *CardData) DictionaryEntriesHandler(w http.ResponseWriter, r *http.Requ
 	var dictEntries []DictionaryEntry
 	for _, id := range idIntSlice {
 		entry := cd.DictionaryMap[id]
-		dictEntries = append(dictEntries, convertJmdictEntryToDictionaryEntry(*entry))
+		dictEntries = append(dictEntries, convertJmdictEntryToDictionaryEntry(cd, *entry))
 	}
 
 	pageData := DictionaryEntriesData{
@@ -928,7 +928,7 @@ func (cd *CardData) AddDictionaryAsCardHandler(w http.ResponseWriter, r *http.Re
 	}
 
 	entry := cd.DictionaryMap[id]
-	dictEntry := convertJmdictEntryToDictionaryEntry(*entry)
+	dictEntry := convertJmdictEntryToDictionaryEntry(cd, *entry)
 	mainCharacter := dictEntry.Expressions[0]
 	otherCharacters := dictEntry.Expressions[1:]
 
