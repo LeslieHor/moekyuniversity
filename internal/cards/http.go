@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -747,6 +748,11 @@ func (cd *CardData) TextAnalysisHandler(w http.ResponseWriter, r *http.Request) 
 
 		taList = append(taList, ta)
 	}
+
+	// Sort the list by Name
+	sort.Slice(taList, func(i, j int) bool {
+		return taList[i].Name < taList[j].Name
+	})
 
 	pageData := struct {
 		TextAnalysisList []TextAnalysis

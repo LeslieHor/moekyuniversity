@@ -154,7 +154,7 @@ func (cd *CardData) GetCard(id int) *Card {
 
 func (cd *CardData) FindVocabulary(vocabulary string) *Card {
 	for _, c := range cd.Cards {
-		if c.Characters == vocabulary && c.Object == "vocabulary" {
+		if c.Object == "vocabulary" && (c.Characters == vocabulary || containsString(c.CharactersAlternateWritings, vocabulary)) {
 			return c
 		}
 	}

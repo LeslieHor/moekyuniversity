@@ -40,20 +40,21 @@ type Reading struct {
 }
 
 type Card struct {
-	ID                     int       `json:"id"`
-	Object                 string    `json:"object"`
-	Level                  int       `json:"level"`
-	DocumentURL            string    `json:"document_url"`
-	Characters             string    `json:"characters"`
-	CharacterImage         string    `json:"character_image"`
-	CharacterAlt           string    `json:"character_alt"`
-	Meanings               []Meaning `json:"meanings"`
-	Readings               []Reading `json:"readings"`
-	PartsOfSpeech          []string  `json:"parts_of_speech"`
-	ComponentSubjectIDs    []int     `json:"component_subject_ids"`
-	AmalgamationSubjectIDs []int     `json:"amalgamation_subject_ids"`
-	ReadingMnemonic        string    `json:"reading_mnemonic"`
-	MeaningMnemonic        string    `json:"meaning_mnemonic"`
+	ID                          int       `json:"id"`
+	Object                      string    `json:"object"`
+	Level                       int       `json:"level"`
+	DocumentURL                 string    `json:"document_url"`
+	Characters                  string    `json:"characters"`
+	CharacterImage              string    `json:"character_image"`
+	CharacterAlt                string    `json:"character_alt"`
+	CharactersAlternateWritings []string  `json:"characters_alternate_writings"`
+	Meanings                    []Meaning `json:"meanings"`
+	Readings                    []Reading `json:"readings"`
+	PartsOfSpeech               []string  `json:"parts_of_speech"`
+	ComponentSubjectIDs         []int     `json:"component_subject_ids"`
+	AmalgamationSubjectIDs      []int     `json:"amalgamation_subject_ids"`
+	ReadingMnemonic             string    `json:"reading_mnemonic"`
+	MeaningMnemonic             string    `json:"meaning_mnemonic"`
 
 	Interval           int    `json:"interval"`          // Hours until next review
 	LearningInterval   int    `json:"learning_interval"` // Hours until next review when in learning stage

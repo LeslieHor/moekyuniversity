@@ -24,6 +24,7 @@
 {{ define "cardTooltip" }}
 <div class="card-tooltip">
     <div class="card-characters">{{.Characters}}</div>
+    <div class="card-readings">Readings: {{range $index, $element := .Readings}}{{if $index}}; {{end}}{{$element.Reading}}{{end}}</div>
     <div class="card-parts-of-speech">{{range $index, $element := .PartsOfSpeech}}{{if $index}};
         {{end}}{{$element}}{{end}}</div>
     <div class="card-meanings">{{range $index, $element := .Meanings}}{{if $index}}; {{end}}{{$element.Meaning}}{{end}}

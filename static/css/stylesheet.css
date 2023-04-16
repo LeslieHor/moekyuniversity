@@ -135,6 +135,13 @@ a {
     font-weight: 900;
 }
 
+.characteralterativewriting {
+    margin: 0.5em 0.5em;
+    padding: 0.5em;
+    border-radius: 0.5em;
+    background-color: rgb(75, 75, 75);
+}
+
 .partsofspeech {
     margin: 0.2em 0.2em;
     padding: 0.2em;
@@ -466,6 +473,13 @@ a {
     color: rgb(170, 170, 170);
 }
 
+.ta-token:hover {
+    text-decoration-line: underline;
+    text-decoration-thickness: 3px;
+    text-decoration-color:rgb(255, 255, 255);
+    text-underline-offset: 6px;
+}
+
 .a-none {
     text-decoration: none;
     color: inherit;
@@ -501,6 +515,11 @@ a {
 
 .card-tooltip .card-characters {
     font-size: 2.0em;
+}
+
+.card-tooltip .card-readings {
+    font-size: 1.5em;
+    color: rgb(168, 168, 168)
 }
 
 .card-tooltip .card-parts-of-speech {
