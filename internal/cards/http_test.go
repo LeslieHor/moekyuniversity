@@ -6,11 +6,11 @@ import (
 )
 
 func LearningStagesCardSlice() []*Card {
-	c1 := CreateCard(1, 9600, 0, "") // Burned
+	c1 := CreateCard(1, 9600, 0, "")                   // Burned
 	c2 := CreateCard(2, 48, 0, "2020-01-01T00:00:00Z") // Learned
-	c3 := CreateCard(3, 0, 3, "2020-01-01T00:00:00Z") // Learning
-	c4 := CreateCard(4, 0, 0, "2020-01-01T00:00:00Z") // Up Next
-	c5 := CreateCard(5, 0, 0, "") // Available
+	c3 := CreateCard(3, 0, 3, "2020-01-01T00:00:00Z")  // Learning
+	c4 := CreateCard(4, 0, 0, "2020-01-01T00:00:00Z")  // Up Next
+	c5 := CreateCard(5, 0, 0, "")                      // Available
 	c5.ComponentSubjectIDs = []int{1, 2}
 	c6 := CreateCard(6, 0, 0, "") // Unavailable
 	c6.ComponentSubjectIDs = []int{5}
@@ -107,11 +107,11 @@ func TestFilterBurned(t *testing.T) {
 }
 
 func LevelCardsSlice() []*Card {
-	c1 := CreateCard(1, 9600, 0, "") // Burned
+	c1 := CreateCard(1, 9600, 0, "")                   // Burned
 	c2 := CreateCard(2, 48, 0, "2020-01-01T00:00:00Z") // Learned
-	c3 := CreateCard(3, 0, 3, "2020-01-01T00:00:00Z") // Learning
-	c4 := CreateCard(4, 0, 0, "2020-01-01T00:00:00Z") // Up Next
-	c5 := CreateCard(5, 0, 0, "") // Available
+	c3 := CreateCard(3, 0, 3, "2020-01-01T00:00:00Z")  // Learning
+	c4 := CreateCard(4, 0, 0, "2020-01-01T00:00:00Z")  // Up Next
+	c5 := CreateCard(5, 0, 0, "")                      // Available
 	c5.ComponentSubjectIDs = []int{1, 2}
 	c6 := CreateCard(6, 0, 0, "") // Unavailable
 	c6.ComponentSubjectIDs = []int{5}
@@ -150,11 +150,11 @@ func TestFilterLevel(t *testing.T) {
 }
 
 func DueCardsSlice() []*Card {
-	c1 := CreateCard(1, 9600, 0, "") // Burned
-	c2 := CreateCard(2, 48, 0, "2020-01-01T00:00:00Z") // In the past
+	c1 := CreateCard(1, 9600, 0, "")                                                // Burned
+	c2 := CreateCard(2, 48, 0, "2020-01-01T00:00:00Z")                              // In the past
 	c3 := CreateCard(3, 0, 3, time.Now().Add(-10*time.Minute).Format(time.RFC3339)) // 10 minutes ago
-	c4 := CreateCard(4, 0, 0, time.Now().Add(2*time.Hour).Format(time.RFC3339)) // 2 hours from now 
-	c5 := CreateCard(5, 0, 0, time.Now().Add(24*3*time.Hour).Format(time.RFC3339)) // 3 days from now
+	c4 := CreateCard(4, 0, 0, time.Now().Add(2*time.Hour).Format(time.RFC3339))     // 2 hours from now
+	c5 := CreateCard(5, 0, 0, time.Now().Add(24*3*time.Hour).Format(time.RFC3339))  // 3 days from now
 	c5.ComponentSubjectIDs = []int{1, 2}
 	c6 := CreateCard(6, 0, 0, time.Now().Add(24*15*time.Hour).Format(time.RFC3339)) // 15 days from now
 	c6.ComponentSubjectIDs = []int{5}
@@ -164,15 +164,6 @@ func DueCardsSlice() []*Card {
 	cd.UpdateCardData()
 
 	return s
-}
-
-func contains(s []int, e int) bool {
-	for _, a := range s {
-		if a == e {
-			return true
-		}
-	}
-	return false
 }
 
 func checkCardListLenAndIds(t *testing.T, length int, codl []*Card, expectedIds []int) {

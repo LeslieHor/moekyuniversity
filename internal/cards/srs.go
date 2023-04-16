@@ -1,15 +1,15 @@
 package cards
 
 import (
+	"html/template"
 	"log"
 	"time"
-	"html/template"
 )
 
 type SrsData struct {
-	DueCount int
-	LearningCount int
-	Card *Card
+	DueCount            int
+	LearningCount       int
+	Card                *Card
 	MeaningMnemonicHtml template.HTML
 	ReadingMnemonicHtml template.HTML
 }
@@ -47,9 +47,9 @@ func (cd *CardData) GetNextSrsCard() SrsData {
 	var card *Card
 	if len(srsDueCards) == 0 {
 		srsData := SrsData{
-			DueCount: 0,
-			LearningCount: 0,
-			Card: nil,
+			DueCount:            0,
+			LearningCount:       0,
+			Card:                nil,
 			MeaningMnemonicHtml: template.HTML(""),
 			ReadingMnemonicHtml: template.HTML(""),
 		}
@@ -59,9 +59,9 @@ func (cd *CardData) GetNextSrsCard() SrsData {
 	card = srsDueCards[0]
 	// Create SRS data
 	srsData := SrsData{
-		DueCount: l,
+		DueCount:      l,
 		LearningCount: len(learningCards),
-		Card: card,
+		Card:          card,
 		MeaningMnemonicHtml: template.HTML(
 			customHtmlTagsToSpan(
 				card.MeaningMnemonic)),
@@ -84,7 +84,7 @@ func (c *Card) CorrectAnswer() {
 		log.Printf("Card %d was reviewed too early. Next review date is %s", c.ID, c.NextReviewDate)
 		return
 	}
-	
+
 	c.ProcessCorrectAnswer()
 }
 

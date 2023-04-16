@@ -1,7 +1,9 @@
-{{ define "windowtitle" }}{{.Card.ID}} - {{if .Card.CharacterAlt}}{{.Card.CharacterAlt}}{{else}}{{.Card.Characters}}{{end}}{{ end }}
+{{ define "windowtitle" }}{{.Card.ID}} - {{if
+.Card.CharacterAlt}}{{.Card.CharacterAlt}}{{else}}{{.Card.Characters}}{{end}}{{ end }}
 {{ define "title" }}
 <span class="id">{{.Card.ID}} - </span>
-<span class="characters {{.Card.Object}}-highlight">{{if .Card.CharacterImage}}<img class="title-character-image" src="/data/img/{{.Card.CharacterImage}}"/>{{else}}{{.Card.Characters}}{{end}}</span>
+<span class="characters {{.Card.Object}}-highlight">{{if .Card.CharacterImage}}<img class="title-character-image"
+        src="/data/img/{{.Card.CharacterImage}}" />{{else}}{{.Card.Characters}}{{end}}</span>
 {{if .Card.Level}}<span class="level">Level {{.Card.Level}}</span>{{end}}
 {{ end }}
 
@@ -13,7 +15,7 @@
             <a href="{{.Card.ID}}">
                 {{if .Card.CharacterImage}}
                 <div class="character-image-container">
-                    <img class="character-image" src="/data/img/{{.Card.CharacterImage}}"/>
+                    <img class="character-image" src="/data/img/{{.Card.CharacterImage}}" />
                 </div>
                 {{else}}
                 <div class="cardjp">{{.Card.Characters}}</div>
@@ -21,7 +23,8 @@
                 <div>{{ (index .Card.Meanings 0).Meaning }}</div>
             </a>
         </div>
-        <div class="tooltip cardbar stage-{{ stripspaces .Card.LearningStageString}}"><span class="tooltiptext">{{.Card.LearningStageString}}</span></div>
+        <div class="tooltip cardbar stage-{{ stripspaces .Card.LearningStageString}}"><span
+                class="tooltiptext">{{.Card.LearningStageString}}</span></div>
     </div>
 </li>
 <ul>
@@ -83,7 +86,8 @@
 {{ if .Card.TotalTimesReviewed }}
 <div class="section">
     <span class="heading">Review Performance:</span>
-    <span class="review-performance">{{.Card.TotalTimesCorrect}} / {{.Card.TotalTimesReviewed}} ({{ percent .Card.TotalTimesCorrect .Card.TotalTimesReviewed }}%)</span>
+    <span class="review-performance">{{.Card.TotalTimesCorrect}} / {{.Card.TotalTimesReviewed}} ({{ percent
+        .Card.TotalTimesCorrect .Card.TotalTimesReviewed }}%)</span>
 </div>
 {{end}}
 
@@ -96,6 +100,19 @@
 {{end}}
 
 <hr>
+
+{{if .Card.CharactersAlternateWritings}}
+<div class="section">
+    <span class="heading">Character Alternate Writings</span>
+    <div class="flow">
+        {{range $index, $element := .Card.CharactersAlternateWritings}}
+        <div class="characteralterativewriting">
+            {{$element}}
+        </div>
+        {{end}}
+    </div>
+</div>
+{{end}}
 
 {{if .Card.PartsOfSpeech}}
 <div class="section">
@@ -170,7 +187,8 @@
                 <div>{{.Meaning}}</div>
             </a>
         </div>
-        <div class="tooltip cardbar stage-{{ stripspaces .LearningStageString}}"><span class="tooltiptext">{{.LearningStageString}}</span></div>
+        <div class="tooltip cardbar stage-{{ stripspaces .LearningStageString}}"><span
+                class="tooltiptext">{{.LearningStageString}}</span></div>
     </div>
     {{end}}
 </div>

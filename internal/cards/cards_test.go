@@ -17,10 +17,10 @@ func checkSearchResults(t *testing.T, results []*Card, expectedIds []int) {
 
 func createCardWithMeaning(id int, characters string, meaning string) *Card {
 	return &Card{ID: id,
-				 Characters: characters,
-				 Meanings: []Meaning {
-					{meaning, true, true},
-				}}
+		Characters: characters,
+		Meanings: []Meaning{
+			{meaning, true, true},
+		}}
 }
 
 func TestSearch(t *testing.T) {
@@ -69,7 +69,7 @@ func TestDelete(t *testing.T) {
 	if ok {
 		t.Errorf("Card 1 was not deleted")
 	}
-	
+
 	// Check that card 2's component and amalgamation subjects are gone
 	if len(cd.Cards[2].ComponentSubjectIDs) != 0 {
 		t.Errorf("Card 2's component subject IDs were not deleted")

@@ -135,6 +135,13 @@ a {
     font-weight: 900;
 }
 
+.characteralterativewriting {
+    margin: 0.5em 0.5em;
+    padding: 0.5em;
+    border-radius: 0.5em;
+    background-color: rgb(75, 75, 75);
+}
+
 .partsofspeech {
     margin: 0.2em 0.2em;
     padding: 0.2em;
@@ -274,6 +281,45 @@ a {
 }
 
 .tooltip:hover .tooltiptext {
+    visibility: visible;
+    opacity: 1;
+}
+
+
+.definition-tooltip {
+    position: relative;
+}
+
+.definition-tooltip .definition-tooltiptext {
+    font-size: 0.5em;
+    visibility: hidden;
+    width: 300px;
+    background-color: #555;
+    color: #fff;
+    text-align: left;
+    border-radius: 6px;
+    padding: 5px 5px;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%;
+    left: 50%;
+    margin-left: -150px;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.definition-tooltip .definition-tooltiptext::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #555 transparent transparent transparent;
+}
+
+.definition-tooltip:hover .definition-tooltiptext {
     visibility: visible;
     opacity: 1;
 }
@@ -419,7 +465,103 @@ a {
     font-size: 1.5em;
 }
 
+.token-missing {
+    color: rgb(255, 103, 103);
+}
+
+.token-none {
+    color: rgb(170, 170, 170);
+}
+
+.ta-token:hover {
+    text-decoration-line: underline;
+    text-decoration-thickness: 3px;
+    text-decoration-color:rgb(255, 255, 255);
+    text-underline-offset: 6px;
+}
+
 .a-none {
     text-decoration: none;
     color: inherit;
+}
+
+.dictionary-entry {
+    color: rgb(255, 255, 255);
+}
+
+.dictionary-entry .dictionary-expressions {
+    font-size: 2.0em;
+}
+
+.dictionary-entry .dictionary-readings {
+    font-size: 1.5em;
+    color: rgb(168, 168, 168)
+}
+
+.dictionary-entry .dictionary-parts-of-speech {
+    font-size: 1.0em;
+    color: rgb(168, 168, 168);
+    margin: 0 0.5em;
+}
+
+.dictionary-entry .dictionary-definitions {
+    font-size: 1.0em;
+    margin: 0 1.0em;
+}
+
+.card-tooltip {
+    color: rgb(255, 255, 255);
+}
+
+.card-tooltip .card-characters {
+    font-size: 2.0em;
+}
+
+.card-tooltip .card-readings {
+    font-size: 1.5em;
+    color: rgb(168, 168, 168)
+}
+
+.card-tooltip .card-parts-of-speech {
+    font-size: 1.0em;
+    color: rgb(168, 168, 168);
+    margin: 0 0.5em;
+}
+
+.card-tooltip .card-meanings {
+    font-size: 1.0em;
+    margin: 0 1.0em;
+}
+
+.dictionary-search-bar {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+#dictionarysearchterm {
+    width: 50%;
+    font-size: 1.0em;
+    border-radius: 0.5em;
+}
+
+#dictionarysearchbutton {
+    width: 70px;
+    font-size: 1.5em;
+    border-radius: 0.5em;
+}
+
+.dict-token {
+    margin: 0.2em 0.2em;
+    padding: 0.2em;
+    border-radius: 0.5em;
+    background-color: rgb(75, 75, 75);
+}
+
+
+.dict-matching-card {
+    margin: 0.2em 0.2em;
+    padding: 0.2em;
+    border-radius: 0.5em;
+    background-color: rgb(75, 75, 75);
 }

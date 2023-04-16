@@ -1,0 +1,76 @@
+{{ define "windowtitle" }}Dictionary - {{.DictSearchTerm}}{{ end }}
+{{ define "title" }}Dictionary - {{.DictSearchTerm}}{{ end }}
+
+{{ define "dictionaryentry" }}
+<div class="dictionary-entry">
+    {{if .Expressions}}
+    <a href="/dictionaryentries?ids={{.ID}}"><div class="dictionary-expressions">{{range $index, $element := .Expressions}}{{if $index}};
+        {{end}}{{$element}}{{end}}</a></div>
+    {{else}}
+    <div class="dictionary-expressions">{{range $index, $element := .Readings}}{{if $index}};
+        {{end}}{{$element}}{{end}}</div>
+    {{end}}
+    {{ if .MatchingCards }}
+    <div class="heading">Existing Cards</div>
+    <div class="flow">
+        {{ range .MatchingCards }}
+        <a href="/card/{{.ID}}"><div class="dict-matching-card">{{.Characters}}</div></a>
+        {{ end }}
+    </div>
+    {{ end }}
+    <div class="dictionary-readings">Readings:{{range $index, $element := .Readings}}{{if $index}};
+        {{end}}{{$element}}{{end}}</div>
+    {{range .Definitions}}
+    <div class="dictionary-parts-of-speech">{{range $index, $element := .PartsOfSpeech}}{{if $index}};
+        {{end}}{{$element}}{{end}}</div>
+    <div class="dictionary-definitions">{{range $index, $element := .Definitions}}{{if $index}};
+        {{end}}{{$element}}{{end}}</div>
+    {{end}}
+</div>
+{{ end }}
+
+{{ define "content" }}
+
+<div>
+    Seach will attempt to tokenise the search term and search for each token. For example, if you search for "私は", it will search for "私" and "は". It will also search in English.
+</div>
+<br>
+<div class="dictionary-search-bar">
+    <input type="text" id="dictionarysearchterm" value="{{.DictSearchTerm}}" />&nbsp;&nbsp;&nbsp;<button id="dictionarysearchbutton" onclick="dictSearch()">🔎</button>
+</div>
+
+<div class="flow">
+{{range .Tokens}}<a href="/dictionarysearch?q={{.}}"><div class="dict-token">{{.}}</div></a>{{end}}
+</div>
+
+{{ range .DictSearchResults }}
+{{ template "dictionaryentry" . }}
+{{ end }}
+
+<script>
+    window.onload = function () {
+        var urlParams = new URLSearchParams(window.location.search);
+        var searchTerm = urlParams.get("q");
+        // Set the search term in the search bar
+        document.getElementById("dictionarysearchterm").value = searchTerm;
+
+        // When the user presses enter in the search bar, search
+        document.getElementById("dictionarysearchterm").onkeypress = function (event) {
+            if (!event) event = window.event;
+            if (event.keyCode == 13) {
+                dictSearch();
+            }
+        };
+    }
+
+    function dictSearch() {
+        // Redirect the user to the search page with the search term
+        // inserted to the URL
+        var searchTerm = document.getElementById("dictionarysearchterm").value;
+        window.location.href = "/dictionarysearch?q=" + searchTerm;
+    }
+</script>
+
+{{ end }}
+
+{{ template "templatemain.html" .}}

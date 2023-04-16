@@ -4,21 +4,31 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"log"
-	"strings"
-	"sort"
-	"time"
-	"path/filepath"
 	"os"
+	"path/filepath"
+	"sort"
+	"strings"
+	"time"
+
+	"foosoft.net/projects/jmdict"
 )
 
 type CardData struct {
-	CardsFile string
-	DataDir   string
-	BackupDir string
-	StaticDir string
-	UpNext    []*Card
-	FuncMap map[string]interface{}
-	Cards map[int]*Card
+	CardsFile          string
+	DataDir            string
+	BackupDir          string
+	StaticDir          string
+	UpNext             []*Card
+	FuncMap            map[string]interface{}
+	Cards              map[int]*Card
+	Dictionary         jmdict.Jmdict
+	DictionaryEntities map[string]string
+	// Maps for fast dictionary searching
+	DictionaryMap                map[int]*jmdict.JmdictEntry      // Sequence ID -> JmdictEntry
+	DictionaryKanjiMap           map[string][]*jmdict.JmdictEntry // Kanji word -> JmdictEntry
+	DictionaryReadingMap         map[string][]*jmdict.JmdictEntry // Reading (in hiragana) -> JmdictEntry
+	DictionaryNonKanjiReadingMap map[string][]*jmdict.JmdictEntry // Reading -> JmdictEntry
+	DictionaryMeaningMap         map[string][]*jmdict.JmdictEntry // Meaning -> JmdictEntry
 }
 
 func (cd *CardData) LoadCardJson() {
@@ -53,13 +63,13 @@ func (cd *CardData) UpdateCardData() {
 	for changesMade {
 		log.Println("Iterating over cards")
 		changesMade = false
-	 	for _, c := range cd.Cards {
+		for _, c := range cd.Cards {
 			oldLearningStage := c.LearningStage
 			c.UpdateLearningStage(cd)
 			if oldLearningStage != c.LearningStage {
 				changesMade = true
 			}
-	 	}
+		}
 	}
 
 	// Check the UpNext list and remove any cards that are no longer in the UpNext stage
@@ -84,7 +94,7 @@ func (cd *CardData) BackupCardMap() {
 	}
 
 	t := time.Now()
-	backupFilename := filepath.Join(cd.BackupDir, "cards-" + t.Format(time.RFC3339) + ".json")
+	backupFilename := filepath.Join(cd.BackupDir, "cards-"+t.Format(time.RFC3339)+".json")
 	log.Printf("Backing up cards to %s", backupFilename)
 	cd.SaveCardMapToFilename(backupFilename)
 }
@@ -145,7 +155,16 @@ func (cd *CardData) GetCard(id int) *Card {
 
 func (cd *CardData) FindVocabulary(vocabulary string) *Card {
 	for _, c := range cd.Cards {
-		if c.Characters == vocabulary && c.Object == "vocabulary" {
+		if c.Object == "vocabulary" && (c.Characters == vocabulary || containsString(c.CharactersAlternateWritings, vocabulary)) {
+			return c
+		}
+	}
+	return nil
+}
+
+func (cd *CardData) FindKanji(kanji string) *Card {
+	for _, c := range cd.Cards {
+		if c.Object == "kanji" && c.Characters == kanji {
 			return c
 		}
 	}
@@ -218,15 +237,16 @@ func filterCardsByDueBetween(cardData []*Card, startTime time.Time, endTime time
 	return cards
 }
 
-func filterCardsByHasNextReviewDate(cardData []*Card) []*Card {
-	var cards []*Card
-	for _, card := range cardData {
-		if card.NextReviewDate != "" {
-			cards = append(cards, card)
-		}
-	}
-	return cards
-}
+// Currently unused
+// func filterCardsByHasNextReviewDate(cardData []*Card) []*Card {
+// 	var cards []*Card
+// 	for _, card := range cardData {
+// 		if card.NextReviewDate != "" {
+// 			cards = append(cards, card)
+// 		}
+// 	}
+// 	return cards
+// }
 
 func filterCardsByType(cardData []*Card, cardType string) []*Card {
 	var cards []*Card
@@ -353,7 +373,7 @@ func sortCardsByDue(cards []*Card) []*Card {
 		}
 
 		return t.Before(t2)
-		})
+	})
 	return cards
 }
 
@@ -389,7 +409,7 @@ func (cd *CardData) Search(search string) []*Card {
 			cards = append(cards, card)
 		}
 	}
-	
+
 	// Search meanings
 	for _, card := range cd.Cards {
 		for _, meaning := range card.Meanings {
@@ -404,7 +424,7 @@ func (cd *CardData) Search(search string) []*Card {
 }
 
 type PartOfSpeech struct {
-	Text string
+	Text     string
 	Selected bool
 }
 
@@ -433,7 +453,7 @@ func (cd *CardData) GetAllPartsOfSpeech(id int) []PartOfSpeech {
 	returnData := []PartOfSpeech{}
 	for _, partOfSpeech := range partsOfSpeech {
 		ps := PartOfSpeech{
-			Text: partOfSpeech,
+			Text:     partOfSpeech,
 			Selected: false,
 		}
 		if containsString(c.PartsOfSpeech, partOfSpeech) {
@@ -479,12 +499,12 @@ func (cd *CardData) GetNewCardId() int {
 }
 
 func containsString(s []string, e string) bool {
-    for _, a := range s {
-        if a == e {
-            return true
-        }
-    }
-    return false
+	for _, a := range s {
+		if a == e {
+			return true
+		}
+	}
+	return false
 }
 
 func containsInt(s []int, e int) bool {
