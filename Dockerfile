@@ -4,7 +4,7 @@ WORKDIR /app
 RUN apk add --no-cache make
 COPY . .
 
-RUN CGO_ENABLED=0 make build
+RUN CGO_ENABLED=0 make clean build
 
 FROM scratch
 WORKDIR /app

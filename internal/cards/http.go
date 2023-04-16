@@ -53,7 +53,7 @@ func SetupRoutes(cd *CardData) {
 	r.HandleFunc("/card/{id}/tagsuspended", cd.CardTagSuspendedHandler)
 	r.HandleFunc("/card/{id}/addtoqueue", cd.CardAddToQueueHandler)
 
-	r.HandleFunc("/cardoverview", cd.OverviewByLearningStageHandler)
+	r.HandleFunc("/cardoverview", cd.OverviewByDueHandler)
 	r.HandleFunc("/cardoverview/bylearningstage", cd.OverviewByLearningStageHandler)
 	r.HandleFunc("/cardoverview/bylevel", cd.OverviewByLevelHandler)
 	r.HandleFunc("/cardoverview/bydue", cd.OverviewByDueHandler)
@@ -709,7 +709,17 @@ func (cd *CardData) OverviewSimulateHandler(w http.ResponseWriter, r *http.Reque
 		t = t.Add(24 * time.Hour)
 	}
 
-	cd.doTemplate(w, r, "cardoverview.html", codl)
+	pageData := struct {
+		CorrectRate      float64
+		NewCardsPerDay   int
+		CardOverviewData []CardOverviewData
+	}{
+		correctRateFloat,
+		newCardsPerDayInt,
+		codl,
+	}
+
+	cd.doTemplate(w, r, "simulation.html", pageData)
 }
 
 func (cd *CardData) OverviewDebugHandler(w http.ResponseWriter, r *http.Request) {

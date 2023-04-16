@@ -24,7 +24,13 @@
 
 <hr>
 
-{{range .}}
+<input type="number" id="simulator-correct-rate" value="{{.CorrectRate}}" />
+<input type="number" id="simulator-cards-per-day" value="{{.NewCardsPerDay}}" />
+<button id="simulator-button">Simulate</button>
+
+<hr>
+
+{{range .CardOverviewData}}
 <div class="section">
     <details>
         <summary>
@@ -52,4 +58,13 @@
     </details>
 </div>
 {{end}}
+
+<script>
+    document.getElementById("simulator-button").addEventListener("click", function() {
+        var correctRate = document.getElementById("simulator-correct-rate").value;
+        var cardsPerDay = document.getElementById("simulator-cards-per-day").value;
+        window.location.href = "/cardoverview/simulate/" + correctRate + "/" + cardsPerDay;
+    });
+</script>
+
 {{ end }}

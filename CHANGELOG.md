@@ -1,5 +1,9 @@
 # Change Log
 
+## 0.2.5 - 2023-04-16
+### Add Simulate Page Link
+Simulation page was previously only accessible directly via the URL. Now there is a link to it on the home page, as well as inputs for the recall rate and number of new cards per day to simulate.
+
 ## 0.2.4 - 2023-04-16
 ### Existing Cards Show on Dictionary Entry
 When viewing a dictionary entry, you can see if there are any cards that already exist for that dictionary entry.
