@@ -42,6 +42,22 @@ func (ta *TextAnalysis) Save(filepath string) {
 	}
 }
 
+func ConvertToken(token tokenizer.Token) Token {
+	bf, _ := token.BaseForm()
+	p, _ := token.Pronunciation()
+	pos := token.POS()
+
+	to := Token{
+		Surface:       token.Surface,
+		BaseForm:      bf,
+		PartsOfSpeech: pos,
+		Pronunciation: p,
+		Token:         token,
+	}
+
+	return to
+}
+
 func (ta *TextAnalysis) Analyse(cd *CardData) {
 	t, err := tokenizer.New(ipa.Dict(), tokenizer.OmitBosEos())
 	if err != nil {
@@ -56,23 +72,14 @@ func (ta *TextAnalysis) Analyse(cd *CardData) {
 	startTime := time.Now()
 	dictCache := make(map[string][]DictionaryEntry)
 	for _, token := range tokens {
-		bf, _ := token.BaseForm()
-		p, _ := token.Pronunciation()
-		pos := token.POS()
+		to := ConvertToken(token)
 
-		to := Token{
-			Surface:       token.Surface,
-			BaseForm:      bf,
-			PartsOfSpeech: pos,
-			Pronunciation: p,
-		}
-
-		c := cd.FindVocabulary(bf)
+		c := cd.FindVocabulary(to.BaseForm)
 		to.Card = c
 		if c == nil {
 			// Cache the dictionary entries that match this token
 			// Improves performance by approximately 3x (depending on the text)
-			key := bf + p
+			key := to.BaseForm + to.Pronunciation
 			if _, ok := dictCache[key]; ok {
 				to.DictionaryEntries = dictCache[key]
 			} else {

@@ -27,6 +27,7 @@ type CardData struct {
 	DictionaryKanjiMap           map[string][]*jmdict.JmdictEntry // Kanji word -> JmdictEntry
 	DictionaryReadingMap         map[string][]*jmdict.JmdictEntry // Reading (in hiragana) -> JmdictEntry
 	DictionaryNonKanjiReadingMap map[string][]*jmdict.JmdictEntry // Reading -> JmdictEntry
+	DictionaryMeaningMap         map[string][]*jmdict.JmdictEntry // Meaning -> JmdictEntry
 }
 
 func (cd *CardData) LoadCardJson() {

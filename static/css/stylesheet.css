@@ -513,3 +513,28 @@ a {
     font-size: 1.0em;
     margin: 0 1.0em;
 }
+
+.dictionary-search-bar {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+#dictionarysearchterm {
+    width: 50%;
+    font-size: 1.0em;
+    border-radius: 0.5em;
+}
+
+#dictionarysearchbutton {
+    width: 70px;
+    font-size: 1.5em;
+    border-radius: 0.5em;
+}
+
+.dict-token {
+    margin: 0.2em 0.2em;
+    padding: 0.2em;
+    border-radius: 0.5em;
+    background-color: rgb(75, 75, 75);
+}

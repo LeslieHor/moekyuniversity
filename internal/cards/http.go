@@ -74,6 +74,7 @@ func SetupRoutes(cd *CardData) {
 	r.HandleFunc("/srs/addupnextcards/{n}", cd.SrsAddUpNextCardsHandler)
 
 	r.HandleFunc("/search", cd.SearchHandler)
+	r.HandleFunc("/dictionarysearch", cd.DictionarySearchHandler)
 
 	http.ListenAndServe(":8080", r)
 }
@@ -852,6 +853,24 @@ func (cd *CardData) SearchHandler(w http.ResponseWriter, r *http.Request) {
 	log.Printf("Search for %s returned %d results", q, len(searchResults))
 
 	cd.doTemplate(w, r, "search.html", pageData)
+}
+
+type DictionarySearchData struct {
+	Tokens            []string
+	DictSearchTerm    string
+	DictSearchResults []DictionaryEntry
+}
+
+func (cd *CardData) DictionarySearchHandler(w http.ResponseWriter, r *http.Request) {
+	// Get search query "q"
+	values := r.URL.Query()
+	q := values.Get("q")
+
+	searchResults := SearchDictionary(cd, q)
+
+	log.Printf("Dictionary search for %s returned %d results", q, len(searchResults.DictSearchResults))
+
+	cd.doTemplate(w, r, "dictionarysearch.html", searchResults)
 }
 
 func (cd *CardData) SrsHandler(w http.ResponseWriter, r *http.Request) {
