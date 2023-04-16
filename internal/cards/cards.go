@@ -24,6 +24,7 @@ type CardData struct {
 	Dictionary         jmdict.Jmdict
 	DictionaryEntities map[string]string
 	// Maps for fast dictionary searching
+	DictionaryMap                map[int]*jmdict.JmdictEntry      // Sequence ID -> JmdictEntry
 	DictionaryKanjiMap           map[string][]*jmdict.JmdictEntry // Kanji word -> JmdictEntry
 	DictionaryReadingMap         map[string][]*jmdict.JmdictEntry // Reading (in hiragana) -> JmdictEntry
 	DictionaryNonKanjiReadingMap map[string][]*jmdict.JmdictEntry // Reading -> JmdictEntry
@@ -155,6 +156,15 @@ func (cd *CardData) GetCard(id int) *Card {
 func (cd *CardData) FindVocabulary(vocabulary string) *Card {
 	for _, c := range cd.Cards {
 		if c.Object == "vocabulary" && (c.Characters == vocabulary || containsString(c.CharactersAlternateWritings, vocabulary)) {
+			return c
+		}
+	}
+	return nil
+}
+
+func (cd *CardData) FindKanji(kanji string) *Card {
+	for _, c := range cd.Cards {
+		if c.Object == "kanji" && c.Characters == kanji {
 			return c
 		}
 	}

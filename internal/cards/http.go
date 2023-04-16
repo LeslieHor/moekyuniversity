@@ -17,6 +17,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
+	"github.com/mochi-co/kana-tools"
 )
 
 func SetupRoutes(cd *CardData) {
@@ -75,7 +76,10 @@ func SetupRoutes(cd *CardData) {
 	r.HandleFunc("/srs/addupnextcards/{n}", cd.SrsAddUpNextCardsHandler)
 
 	r.HandleFunc("/search", cd.SearchHandler)
+
 	r.HandleFunc("/dictionarysearch", cd.DictionarySearchHandler)
+	r.HandleFunc("/dictionaryentries", cd.DictionaryEntriesHandler)
+	r.HandleFunc("/adddictionaryascard/{id}", cd.AddDictionaryAsCardHandler)
 
 	http.ListenAndServe(":8080", r)
 }
@@ -877,6 +881,112 @@ func (cd *CardData) DictionarySearchHandler(w http.ResponseWriter, r *http.Reque
 	log.Printf("Dictionary search for %s returned %d results", q, len(searchResults.DictSearchResults))
 
 	cd.doTemplate(w, r, "dictionarysearch.html", searchResults)
+}
+
+type DictionaryEntriesData struct {
+	DictEntries []DictionaryEntry
+}
+
+func (cd *CardData) DictionaryEntriesHandler(w http.ResponseWriter, r *http.Request) {
+	// Get the ids from the URL query
+	// e.g. /dictionaryentries?ids=1,2,3
+	values := r.URL.Query()
+	ids := values.Get("ids")
+	// Split the ids into a slice
+	idSlice := strings.Split(ids, ",")
+	// Convert the ids to ints
+	var idIntSlice []int
+	for _, id := range idSlice {
+		idInt, err := strconv.Atoi(id)
+		if err != nil {
+			log.Printf("Error converting id to int: %s", err)
+			return
+		}
+		idIntSlice = append(idIntSlice, idInt)
+	}
+
+	// Get the dictionary entries
+	var dictEntries []DictionaryEntry
+	for _, id := range idIntSlice {
+		entry := cd.DictionaryMap[id]
+		dictEntries = append(dictEntries, convertJmdictEntryToDictionaryEntry(*entry))
+	}
+
+	pageData := DictionaryEntriesData{
+		DictEntries: dictEntries,
+	}
+
+	cd.doTemplate(w, r, "dictionaryentries.html", pageData)
+}
+
+func (cd *CardData) AddDictionaryAsCardHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id, err := strconv.Atoi(vars["id"])
+	if err != nil {
+		log.Printf("Error converting id to int: %s", err)
+		return
+	}
+
+	entry := cd.DictionaryMap[id]
+	dictEntry := convertJmdictEntryToDictionaryEntry(*entry)
+	mainCharacter := dictEntry.Expressions[0]
+	otherCharacters := dictEntry.Expressions[1:]
+
+	var meanings []Meaning
+	var partsOfSpeech []string
+	for _, m := range dictEntry.Definitions {
+		for _, d := range m.Definitions {
+			meanings = append(meanings, Meaning{
+				Meaning:        d,
+				Primary:        false,
+				AcceptedAnswer: false,
+			})
+		}
+		for _, m := range m.PartsOfSpeech {
+			if !containsString(partsOfSpeech, m) {
+				partsOfSpeech = append(partsOfSpeech, m)
+			}
+		}
+	}
+
+	var readings []Reading
+	for _, m := range dictEntry.Readings {
+		readings = append(readings, Reading{
+			Reading:        m,
+			Primary:        false,
+			AcceptedAnswer: false,
+		})
+	}
+
+	kanjis := kana.ExtractKanji(mainCharacter)
+	var componentIds []int
+	for _, k := range kanjis {
+		kanjiCard := cd.FindKanji(k)
+		if kanjiCard != nil {
+			componentIds = append(componentIds, kanjiCard.ID)
+		}
+	}
+
+	// Create a new card
+	c := Card{
+		ID:                          cd.GetNewCardId(),
+		Object:                      "vocabulary", // New cards from dictionary are always vocabulary
+		Level:                       0,            // So they don't appear as a wanikani level card
+		Characters:                  mainCharacter,
+		CharactersAlternateWritings: otherCharacters,
+		Meanings:                    meanings,
+		Readings:                    readings,
+		PartsOfSpeech:               partsOfSpeech,
+		ComponentSubjectIDs:         componentIds,
+		Tags:                        []string{"TODO", "added_from_dictionary"},
+	}
+
+	cd.AddCard(&c)
+	cd.UpdateCardData()
+	cd.SaveCardMap()
+
+	// Redirect to the card page
+	http.Redirect(w, r, fmt.Sprintf("/card/%d", c.ID), http.StatusFound)
 }
 
 func (cd *CardData) SrsHandler(w http.ResponseWriter, r *http.Request) {

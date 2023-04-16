@@ -11,6 +11,7 @@ import (
 )
 
 type DictionaryEntry struct {
+	ID          int
 	Expressions []string // Word in kanji
 	Readings    []string // Pronunciations in hiragana
 	Definitions []DictionaryDefinition
@@ -40,12 +41,16 @@ func (cd *CardData) LoadDictionary() {
 
 	log.Printf("Building dictionary index...")
 	// create map by kanji and by readings
+	var dictMap = make(map[int]*jmdict.JmdictEntry)
 	var kanjiMap = make(map[string][]*jmdict.JmdictEntry)
 	var readingMap = make(map[string][]*jmdict.JmdictEntry)
 	var nonKanjiReadingMap = make(map[string][]*jmdict.JmdictEntry)
 	var meaningMap = make(map[string][]*jmdict.JmdictEntry)
 	for i := range dict.Entries {
 		entry := &dict.Entries[i]
+
+		dictMap[entry.Sequence] = entry
+
 		for _, kanji := range entry.Kanji {
 			kanjiMap[kanji.Expression] = append(kanjiMap[kanji.Expression], entry)
 		}
@@ -77,6 +82,7 @@ func (cd *CardData) LoadDictionary() {
 
 	log.Printf("Index built")
 	cd.Dictionary = dict
+	cd.DictionaryMap = dictMap
 	cd.DictionaryKanjiMap = kanjiMap
 	cd.DictionaryReadingMap = readingMap
 	cd.DictionaryNonKanjiReadingMap = nonKanjiReadingMap
@@ -162,9 +168,19 @@ func SearchDictionary(cd *CardData, query string) DictionarySearchData {
 		}
 	}
 
+	// Remove duplicates from the result
+	var ids []int
+	var dedupedResult []DictionaryEntry
+	for _, entry := range result {
+		if !containsInt(ids, entry.ID) {
+			ids = append(ids, entry.ID)
+			dedupedResult = append(dedupedResult, entry)
+		}
+	}
+
 	return DictionarySearchData{
 		DictSearchTerm:    originalQuery,
-		DictSearchResults: result,
+		DictSearchResults: dedupedResult,
 		Tokens:            tokenStrings,
 	}
 }
@@ -185,6 +201,8 @@ func convertJmdictEntryToDictionaryEntry(entry jmdict.JmdictEntry) DictionaryEnt
 	var de DictionaryEntry
 
 	de.JmdictEntry = entry
+
+	de.ID = entry.Sequence
 
 	for _, kanji := range entry.Kanji {
 		de.Expressions = append(de.Expressions, kanji.Expression)
@@ -207,4 +225,13 @@ func convertJmdictEntryToDictionaryEntry(entry jmdict.JmdictEntry) DictionaryEnt
 	}
 
 	return de
+}
+
+func ConvertJmDictPOSt(pos string) string {
+	switch pos {
+	case "test":
+		return "test"
+	default:
+		return pos
+	}
 }

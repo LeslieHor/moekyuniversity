@@ -4,8 +4,8 @@
 {{ define "dictionaryentry" }}
 <div class="dictionary-entry">
     {{if .Expressions}}
-    <div class="dictionary-expressions">{{range $index, $element := .Expressions}}{{if $index}};
-        {{end}}{{$element}}{{end}}</div>
+    <a href="/dictionaryentries?ids={{.ID}}"><div class="dictionary-expressions">{{range $index, $element := .Expressions}}{{if $index}};
+        {{end}}{{$element}}{{end}}</a></div>
     {{else}}
     <div class="dictionary-expressions">{{range $index, $element := .Readings}}{{if $index}};
         {{end}}{{$element}}{{end}}</div>

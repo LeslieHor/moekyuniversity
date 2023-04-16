@@ -1,0 +1,38 @@
+{{ define "dicttitle" }}{{if .Expressions}}{{range $index, $element := .Expressions}}{{if $index}};{{end}}{{$element}}{{end}}{{else}}{{range $index, $element := .Readings}}{{if $index}};{{end}}{{$element}}{{end}}{{end}}{{ end }}
+
+{{ define "windowtitle" }}Dictionary - {{ range .DictEntries }}{{template "dicttitle" .}};{{ end }}{{ end }}
+{{ define "title" }}Dictionary - {{ range .DictEntries }}{{template "dicttitle" .}};{{ end }}{{ end }}
+
+{{if .Expressions}}{{range $index, $element := .Expressions}}{{if $index}};{{end}}{{$element}}{{end}}{{else}}{{range $index, $element := .Readings}}{{if $index}};{{end}}{{$element}}{{end}}{{end}}
+
+{{ define "dictionaryentry" }}
+<div class="dictionary-entry">
+    {{if .Expressions}}
+    <div class="dictionary-expressions">{{range $index, $element := .Expressions}}{{if $index}};
+        {{end}}{{$element}}{{end}}</div>
+    {{else}}
+    <div class="dictionary-expressions">{{range $index, $element := .Readings}}{{if $index}};
+        {{end}}{{$element}}{{end}}</div>
+    {{end}}
+    <div class="dict-options"><a href="/adddictionaryascard/{{.ID}}">Add as card</a></div>
+    <div class="dictionary-readings">Readings:{{range $index, $element := .Readings}}{{if $index}};
+        {{end}}{{$element}}{{end}}</div>
+    {{range .Definitions}}
+    <div class="dictionary-parts-of-speech">{{range $index, $element := .PartsOfSpeech}}{{if $index}};
+        {{end}}{{$element}}{{end}}</div>
+    <div class="dictionary-definitions">{{range $index, $element := .Definitions}}{{if $index}};
+        {{end}}{{$element}}{{end}}</div>
+    {{end}}
+</div>
+{{ end }}
+
+{{ define "content" }}
+
+{{ range $index, $element := .DictEntries }}
+{{if $index}}<hr>{{end}}
+{{ template "dictionaryentry" $element }}
+{{ end }}
+
+{{ end }}
+
+{{ template "templatemain.html" .}}

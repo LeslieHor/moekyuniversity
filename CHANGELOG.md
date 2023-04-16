@@ -1,5 +1,9 @@
 # Change Log
 
+## 0.2.3 - 2023-04-16
+### Add New Cards from Dictionary Entry
+When viewing a dictionary entry, you can add a new card pre-populated with the dictionary entry's information.
+
 ## 0.2.2 - 2023-04-16
 ### Alternate Writings
 Add ability to have alternate writings for a card. This is useful for cards that have a different writing than the one that would be used in a sentence. E.g. 達 vs たち.
