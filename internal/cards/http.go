@@ -75,6 +75,8 @@ func SetupRoutes(cd *CardData) {
 	r.HandleFunc("/srs/incorrect/{id}", cd.SrsIncorrectHandler)
 	r.HandleFunc("/srs/addupnextcards/{n}", cd.SrsAddUpNextCardsHandler)
 
+	r.HandleFunc(("/schedule"), cd.ScheduleHandler)
+
 	r.HandleFunc("/search", cd.SearchHandler)
 
 	r.HandleFunc("/dictionarysearch", cd.DictionarySearchHandler)
@@ -855,6 +857,21 @@ func (cd *CardData) TextAnalysisIdDeleteHandler(w http.ResponseWriter, r *http.R
 
 	// Redirect to the text analysis overview page
 	http.Redirect(w, r, "/textanalysis", http.StatusFound)
+}
+
+type ScheduleData struct {
+	Schedule []ScheduleEntry
+}
+
+type ScheduleEntry struct {
+	Time  string
+	Count int
+}
+
+func (cd *CardData) ScheduleHandler(w http.ResponseWriter, r *http.Request) {
+	pageData := ScheduleData{}
+	pageData.Schedule = cd.GetScheduleData()
+	cd.doTemplate(w, r, "schedule.html", pageData)
 }
 
 func (cd *CardData) SearchHandler(w http.ResponseWriter, r *http.Request) {

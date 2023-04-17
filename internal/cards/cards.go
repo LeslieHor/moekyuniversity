@@ -239,7 +239,8 @@ func filterCardsByDueBetween(cardData []*Card, startTime time.Time, endTime time
 		}
 
 		// If the card is due between the start and end times, add it to the list
-		if t.After(startTime) && t.Before(endTime) {
+		// Inclusive of the start time, exclusive of the end time
+		if (t.Equal(startTime) || t.After(startTime)) && t.Before(endTime) {
 			cards = append(cards, card)
 		}
 	}
@@ -541,4 +542,32 @@ func removeCard(s []*Card, e *Card) []*Card {
 		}
 	}
 	return s
+}
+
+func (cd *CardData) GetScheduleData() []ScheduleEntry {
+	// Find the counts of reviews for each hour for the next 48 hours
+	var scheduleData []ScheduleEntry
+	var t1, t2 time.Time
+	cards := cd.ToList()
+
+	// Initialise t1 to the next XX:00
+	// And set t2 to the next hour
+	t1 = time.Now().Truncate(time.Hour)
+	t2 = t1.Add(time.Hour)
+
+	for i := 0; i < 300; i++ {
+		// Get the number of cards that will be reviewed in this hour period
+		cs := filterCardsByDueBetween(cards, t1, t2)
+		count := len(cs)
+		scheduleData = append(scheduleData, ScheduleEntry{
+			Time:  t2.Format("2006-01-02 15:04"),
+			Count: count,
+		})
+
+		// Increment t1 and t2 by one hour
+		t1 = t1.Add(time.Hour)
+		t2 = t2.Add(time.Hour)
+	}
+
+	return scheduleData
 }

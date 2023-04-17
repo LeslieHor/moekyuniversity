@@ -565,3 +565,18 @@ a {
     border-radius: 0.5em;
     background-color: rgb(75, 75, 75);
 }
+
+.schedule-time {
+    color: rgb(129, 129, 129);
+    margin-right: 10px;
+}
+
+.schedule-bar {
+    height: 20px;
+    background-color: rgb(58, 127, 255);
+    text-align: left;
+}
+
+.schedule-count {
+    margin-left: 5px;
+}

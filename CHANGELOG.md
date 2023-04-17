@@ -1,5 +1,9 @@
 # Change Log
 
+## 0.2.8 - 2023-04-17
+### Add schedule page
+The `/schedule` page shows how many cards will be due for review in each hour for the next 48 hours.
+
 ## 0.2.7 - 2023-04-17
 ### Fix bug with tagging suspended cards in the Up Next queue
 When a card was in the Up Next queue, and was suspended, the card would not be removed from the queue.

@@ -1,0 +1,14 @@
+{{ define "windowtitle" }}Schedule{{ end }}
+{{ define "title" }}Schedule{{ end }}
+
+{{ define "content" }}
+{{ range .Schedule }}
+<div class="flow">
+    <div class="schedule-time">{{.Time}}</div>
+    <div class="schedule-bar" style="width: {{ add (mul .Count 5) 0}}px;"></div>
+    <div class="schedule-count">{{.Count}}</div>
+</div>
+{{ end }}
+{{ end }}
+
+{{ template "templatemain.html" .}}
