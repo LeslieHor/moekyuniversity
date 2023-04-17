@@ -1,5 +1,12 @@
 # Change Log
 
+## 0.2.7 - 2023-04-17
+### Fix bug with tagging suspended cards in the Up Next queue
+When a card was in the Up Next queue, and was suspended, the card would not be removed from the queue.
+
+### Fix bug with adding unlearned components to Up Next cards
+When a card was in the Up Next state and an unlearned component was added to it, the card would not be reevaluated to Queued to Learn
+
 ## 0.2.6 - 2023-04-16
 ### Fix bug with links in dictionary entries
 When a dictionary entry had no kanji, and only showed the reading, the link to the dictionary entry would not work.
