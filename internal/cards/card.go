@@ -93,14 +93,6 @@ func (c *Card) UpdateLearningStage(cd *CardData) {
 		return
 	}
 
-	if c.Interval == 0 &&
-		c.LearningInterval == 0 &&
-		c.NextReviewDate != "" {
-		c.LearningStage = UpNext
-		c.LearningStageString = LearningStageToString(c.LearningStage)
-		return
-	}
-
 	dt := c.GetDataTree(cd)
 	acl := dt.IsAllChildrenLearned()
 
@@ -110,7 +102,6 @@ func (c *Card) UpdateLearningStage(cd *CardData) {
 		c.LearningStage = UpNext
 		c.NextReviewDate = time.Unix(0, 0).Format(time.RFC3339)
 		c.LearningStageString = LearningStageToString(c.LearningStage)
-		c.QueuedToLearn = false
 		return
 
 	} else if c.QueuedToLearn && !acl {
