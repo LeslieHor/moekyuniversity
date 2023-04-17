@@ -377,6 +377,7 @@ func (cd *CardData) CardTagSuspendedHandler(w http.ResponseWriter, r *http.Reque
 	c := cd.GetCard(id)
 	c.TagSuspended()
 	cd.UpdateCardData()
+	cd.RemoveUpNextCard(id) // Remove the card from the queue if it's there
 	cd.SaveCardMap()
 
 	// Redirect to the card page

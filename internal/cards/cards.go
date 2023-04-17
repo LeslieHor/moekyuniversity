@@ -136,6 +136,15 @@ func (cd *CardData) AddUpNextCards(n int) {
 	}
 }
 
+func (cd *CardData) RemoveUpNextCard(id int) {
+	for i, c := range cd.UpNext {
+		if c.ID == id {
+			cd.UpNext = append(cd.UpNext[:i], cd.UpNext[i+1:]...)
+			break
+		}
+	}
+}
+
 func (cd *CardData) GetUpNextCards() []*Card {
 	// Each time we get a card, rotate the list so that the most recently seen card is last
 	if len(cd.UpNext) > 0 {
