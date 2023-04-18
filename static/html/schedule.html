@@ -2,6 +2,11 @@
 {{ define "title" }}Schedule{{ end }}
 
 {{ define "content" }}
+
+<div class="section">
+    This page shows the number of cards that are scheduled to be reviewed for a given hour for the next 48 hours.
+</div>
+
 {{ range .Schedule }}
 <div class="flow">
     <div class="schedule-time">{{.Time}}</div>

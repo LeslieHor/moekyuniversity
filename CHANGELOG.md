@@ -1,5 +1,9 @@
 # Change Log
 
+## 0.2.9 - 2023-04-18
+### Add known kanji percentage page
+The `/kanjifrequency` shows how many kanji you will be able to read for various online sources, based on the frequency of the kanji in the sources and the number of kanji you know.
+
 ## 0.2.8 - 2023-04-17
 ### Add schedule page
 The `/schedule` page shows how many cards will be due for review in each hour for the next 48 hours.

@@ -75,13 +75,15 @@ func SetupRoutes(cd *CardData) {
 	r.HandleFunc("/srs/incorrect/{id}", cd.SrsIncorrectHandler)
 	r.HandleFunc("/srs/addupnextcards/{n}", cd.SrsAddUpNextCardsHandler)
 
-	r.HandleFunc(("/schedule"), cd.ScheduleHandler)
+	r.HandleFunc("/schedule", cd.ScheduleHandler)
 
 	r.HandleFunc("/search", cd.SearchHandler)
 
 	r.HandleFunc("/dictionarysearch", cd.DictionarySearchHandler)
 	r.HandleFunc("/dictionaryentries", cd.DictionaryEntriesHandler)
 	r.HandleFunc("/adddictionaryascard/{id}", cd.AddDictionaryAsCardHandler)
+
+	r.HandleFunc("/kanjifrequency", cd.KanjiFrequencyHandler)
 
 	http.ListenAndServe(":8080", r)
 }
@@ -624,7 +626,6 @@ func (cd *CardData) OverviewSimulateHandler(w http.ResponseWriter, r *http.Reque
 	codl := []CardOverviewData{}
 	cl := cd.ToList()
 	cl = filterCardsByLearned(cl)
-	cl = filterOutCardsByLearningStage(cl, Burned)
 
 	// Create a copy of the card list
 	for i, c := range cl {
@@ -1015,6 +1016,21 @@ func (cd *CardData) AddDictionaryAsCardHandler(w http.ResponseWriter, r *http.Re
 
 	// Redirect to the card page
 	http.Redirect(w, r, fmt.Sprintf("/card/%d", c.ID), http.StatusFound)
+}
+
+type KanjiFrequencyData struct {
+	Name         string
+	TotalPercent int
+}
+
+func (cd *CardData) KanjiFrequencyHandler(w http.ResponseWriter, r *http.Request) {
+	kf := cd.GetKanjiFrequencyData()
+	pageData := struct {
+		KanjiFrequencyData []KanjiFrequencyData
+	}{
+		KanjiFrequencyData: kf,
+	}
+	cd.doTemplate(w, r, "kanjifrequency.html", pageData)
 }
 
 func (cd *CardData) SrsHandler(w http.ResponseWriter, r *http.Request) {

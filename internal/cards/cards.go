@@ -571,3 +571,63 @@ func (cd *CardData) GetScheduleData() []ScheduleEntry {
 
 	return scheduleData
 }
+
+type KanjiFrequency struct {
+	Name  string        `json:"name"`
+	Total int           `json:"total"`
+	Data  []interface{} `json:"data"` // <KANJI>,<COUNT>,<PERCENTAGE>
+}
+
+func (cd *CardData) GetKanjiFrequencyData() []KanjiFrequencyData {
+	// For each file in the kanji frequency data directory,
+	// Calculate the known percentage of the kanji.
+
+	files, err := ioutil.ReadDir("data/kanji_frequencies")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// Create a list of known kanji
+	knownKanji := []string{}
+	for _, c := range cd.ToList() {
+		if c.Object == "kanji" && (c.LearningStage == Learned || c.LearningStage == Burned) {
+			knownKanji = append(knownKanji, c.Characters)
+		}
+	}
+
+	var kanjiFrequencyData []KanjiFrequencyData
+
+	for _, f := range files {
+		filepath := filepath.Join("data/kanji_frequencies", f.Name())
+		file, err := os.Open(filepath)
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer file.Close()
+
+		// Read and unmarshal the file
+		var data KanjiFrequency
+		decoder := json.NewDecoder(file)
+		err = decoder.Decode(&data)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		// Calculate the percentage of known kanji
+		knownPercentage := 0.0
+		for _, d := range data.Data {
+			kanji := d.([]interface{})[0].(string)
+			if containsString(knownKanji, kanji) {
+				knownPercentage += d.([]interface{})[2].(float64)
+			}
+		}
+
+		// Add the known percentage to the data
+		kanjiFrequencyData = append(kanjiFrequencyData, KanjiFrequencyData{
+			Name:         data.Name,
+			TotalPercent: int(knownPercentage * 100),
+		})
+	}
+
+	return kanjiFrequencyData
+}

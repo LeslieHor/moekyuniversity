@@ -1,0 +1,33 @@
+{{ define "windowtitle" }}Schedule{{ end }}
+{{ define "title" }}Schedule{{ end }}
+
+{{ define "content" }}
+<div class="section">
+    This page shows the percentage of known kanji for various data sources. The percentage takes into account the frequencies of the kanji in the data source.
+</div>
+    
+<div class="section">
+    For example, if a data source has the kanji "一" 10 times and the kanji "二" 5 times, then the percentage of kanji for "一" is 67% and the percentage of kanji for "二" is 33%. Thus, if you know "一" but not "二", then the percentage of known kanji for the data source is 67%.
+</div>
+
+<table>
+    {{ range .KanjiFrequencyData }}
+    <tr>
+        <td>
+            <div class="kanji-freq-name">{{.Name}}</div>
+        </td>
+        <td>
+            <div class="flow">
+                <div class="kanji-freq-bar" style="width: {{ mul .TotalPercent 5 }}px;"></div>
+                <div class="kanji-freq-bar-remaining" style="width: {{ mul (sub 100 .TotalPercent) 5 }}px;"></div>
+            </div>
+        </td>
+        <td>
+            <div class="kanji-freq-percent">{{.TotalPercent}}%</div>
+        </td>
+    </tr>
+    {{ end }}
+</table>
+{{ end }}
+
+{{ template "templatemain.html" .}}

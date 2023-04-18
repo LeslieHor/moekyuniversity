@@ -580,3 +580,24 @@ a {
 .schedule-count {
     margin-left: 5px;
 }
+
+.kanji-freq-name {
+    color: rgb(129, 129, 129);
+    margin-right: 10px;
+}
+
+.kanji-freq-bar {
+    height: 20px;
+    background-color: rgb(58, 127, 255);
+    text-align: left;
+}
+
+.kanji-freq-bar-remaining {
+    height: 20px;
+    background-color: rgb(146, 146, 146);
+    text-align: left;
+}
+
+.kanji-freq-percent {
+    margin-left: 5px;
+}
