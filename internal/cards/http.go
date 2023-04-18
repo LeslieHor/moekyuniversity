@@ -989,10 +989,12 @@ func (cd *CardData) AddDictionaryAsCardHandler(w http.ResponseWriter, r *http.Re
 
 	kanjis := kana.ExtractKanji(mainCharacter)
 	var componentIds []int
+	var defaultMeaningMneumonic string
 	for _, k := range kanjis {
 		kanjiCard := cd.FindKanji(k)
 		if kanjiCard != nil {
 			componentIds = append(componentIds, kanjiCard.ID)
+			defaultMeaningMneumonic += "<kanji>" + kanjiCard.Meanings[0].Meaning + "</kanji> "
 		}
 	}
 
@@ -1008,6 +1010,8 @@ func (cd *CardData) AddDictionaryAsCardHandler(w http.ResponseWriter, r *http.Re
 		PartsOfSpeech:               partsOfSpeech,
 		ComponentSubjectIDs:         componentIds,
 		Tags:                        []string{"TODO", "added_from_dictionary"},
+		MeaningMnemonic:             defaultMeaningMneumonic,
+		ReadingMnemonic:             "This is a jukugo word, which usually means on'yomi readings from the kanji. If you know the readings of your kanji you'll know how to read this as well.",
 	}
 
 	cd.AddCard(&c)

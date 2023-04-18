@@ -53,8 +53,8 @@ type Card struct {
 	PartsOfSpeech               []string  `json:"parts_of_speech"`
 	ComponentSubjectIDs         []int     `json:"component_subject_ids"`
 	AmalgamationSubjectIDs      []int     `json:"amalgamation_subject_ids"`
-	ReadingMnemonic             string    `json:"reading_mnemonic"`
 	MeaningMnemonic             string    `json:"meaning_mnemonic"`
+	ReadingMnemonic             string    `json:"reading_mnemonic"`
 
 	Interval           int    `json:"interval"`          // Hours until next review
 	LearningInterval   int    `json:"learning_interval"` // Hours until next review when in learning stage

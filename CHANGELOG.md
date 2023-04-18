@@ -1,6 +1,9 @@
 # Change Log
 
-## 0.3.0 - 2023-04-18
+## 0.2.11 - 2023-04-18
+### Add defaults meaning and reading mneumonics for cards added from the dictionary
+
+## 0.2.10 - 2023-04-18
 ### Fix page title for kanjifrequency page
 
 ## 0.2.9 - 2023-04-18
