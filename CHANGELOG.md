@@ -1,5 +1,8 @@
 # Change Log
 
+## 0.3.0 - 2023-04-18
+### Fix page title for kanjifrequency page
+
 ## 0.2.9 - 2023-04-18
 ### Add known kanji percentage page
 The `/kanjifrequency` shows how many kanji you will be able to read for various online sources, based on the frequency of the kanji in the sources and the number of kanji you know.
