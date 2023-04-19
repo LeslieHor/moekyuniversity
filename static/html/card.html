@@ -154,6 +154,17 @@
 </div>
 {{end}}
 
+{{ if .Card.Audio }}
+<div class="section">
+    <span class="heading">Audio</span>
+    <div class="flow">
+        {{range $index, $element := .Card.Audio}}
+        <div class="audio-play-button" onclick="playAudio({{$element.Filename}})">▶</div>
+        {{end}}
+    </div>
+</div>
+{{end}}
+
 <hr>
 
 <div class="section">
@@ -213,6 +224,15 @@
         xhr.send(JSON.stringify({}));
         xhr.onloadend = function () {
             window.location.reload();
+        };
+    }
+
+    function playAudio(filename) {
+        var audio = new Audio('/data/audio/' + filename);
+        audio.play();
+        // Remove the audio element after it has finished playing
+        audio.onended = function () {
+            audio.remove();
         };
     }
 </script>

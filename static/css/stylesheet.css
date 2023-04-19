@@ -476,7 +476,7 @@ a {
 .ta-token:hover {
     text-decoration-line: underline;
     text-decoration-thickness: 3px;
-    text-decoration-color:rgb(255, 255, 255);
+    text-decoration-color: rgb(255, 255, 255);
     text-underline-offset: 6px;
 }
 
@@ -600,4 +600,16 @@ a {
 
 .kanji-freq-percent {
     margin-left: 5px;
+}
+
+.audio-play-button {
+    width: 50px;
+    height: 50px;
+    background-color: rgb(75, 75, 75);
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 10px;
 }

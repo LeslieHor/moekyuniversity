@@ -39,6 +39,11 @@ type Reading struct {
 	AcceptedAnswer bool   `json:"accepted_answer"`
 }
 
+type Audio struct {
+	Filename string `json:"filename"`
+	AutoPlay bool   `json:"autoplay"`
+}
+
 type Card struct {
 	ID                          int       `json:"id"`
 	Object                      string    `json:"object"`
@@ -55,6 +60,7 @@ type Card struct {
 	AmalgamationSubjectIDs      []int     `json:"amalgamation_subject_ids"`
 	MeaningMnemonic             string    `json:"meaning_mnemonic"`
 	ReadingMnemonic             string    `json:"reading_mnemonic"`
+	Audio                       []Audio   `json:"audio"`
 
 	Interval           int    `json:"interval"`          // Hours until next review
 	LearningInterval   int    `json:"learning_interval"` // Hours until next review when in learning stage

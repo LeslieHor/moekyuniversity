@@ -27,7 +27,7 @@
     <div class="srs-object-type">{{ .Card.Object }}</div>
     {{if .Card.CharacterImage}}
     <div class="character-srs-image-container {{ .Card.Object }}-highlight srs-jp">
-        <img class="character-srs-image" src="/data/img/{{.Card.CharacterImage}}"/>
+        <img class="character-srs-image" src="/data/img/{{.Card.CharacterImage}}" />
     </div>
     {{else}}
     <div class="{{ .Card.Object }}-highlight srs-jp">{{.Card.Characters}}</div>
@@ -51,14 +51,14 @@
         <div class="srs-answer srs-hidden answer-reading">
             {{ if .Card.Readings }}
             {{ range .Card.Readings }}
-            <div class="srs-reading {{if not .AcceptedAnswer}}srs-not-accepted{{end}}">{{ if .Type}}{{.Type}}: {{end}}{{ .Reading }}</div>
+            <div class="srs-reading {{if not .AcceptedAnswer}}srs-not-accepted{{end}}">{{ if .Type}}{{.Type}}: {{end}}{{
+                .Reading }}</div>
             {{ end }}
             {{ else }}
             <div class="srs-reading">No Readings</div>
             {{ end }}
         </div>
     </div>
-
     <div class="srs-answer-section" onclick="toggleAnswerMeaning()">
         <div class="srs-heading">Meaning Mneumonic</div>
         <div class="srs-answer srs-hidden answer-meaning">
@@ -84,6 +84,19 @@
             <div class="srs-information">Learning Interval: {{ .Card.LearningInterval }}</div>
         </div>
     </div>
+
+    <div class="srs-answer-section">
+        <div class="srs-heading">Audio</div>
+        <div class="srs-answer srs-hidden answer-reading">
+            {{ if .Card.Audio }}
+            <div class="flow">
+                {{range $index, $element := .Card.Audio}}
+                <div class="audio-play-button" onclick="playAudio({{$element.Filename}})">▶</div>
+                {{end}}
+            </div>
+            {{end}}
+        </div>
+    </div>
 </div>
 
 <div class="srs-submit srs-submit-hidden">
@@ -99,6 +112,7 @@
     // When both meaning and reading are hidden, show the submit buttons
     var meaningShown = false;
     var readingShown = false;
+    var audioFiles = [{{ range $index, $element:= .Card.Audio }}'{{$element.Filename}}', {{ end }}]
 
     function toggleAnswer(className) {
         var x = document.getElementsByClassName(className);
@@ -146,6 +160,9 @@
 
     function toggleAnswerReading() {
         toggleAnswer("answer-reading");
+        if (readingShown) {
+            playAudioList(0);
+        }
     }
 
     function toggleAnswerMeaning() {
@@ -166,12 +183,34 @@
         };
     }
 
+    function playAudio(filename) {
+        var audio = new Audio('/data/audio/' + filename);
+        audio.play();
+        // Remove the audio element after it has finished playing
+        audio.onended = function () {
+            audio.remove();
+        };
+    }
+
+    function playAudioList(i) {
+        if (i >= audioFiles.length) {
+            return;
+        }
+        var audio = new Audio('/data/audio/' + audioFiles[i]);
+        audio.play();
+        audio.onended = function () {
+            audio.remove();
+            if (i < audioFiles.length - 1) {
+                playAudioList(i + 1);
+            }
+        }
+    }
 </script>
 
 {{ else }}
 
 <div class="banner">
-Congratulations! You have no cards due!
+    Congratulations! You have no cards due!
 </div>
 <br>
 <div class="srs-add-new-cards">
