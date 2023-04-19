@@ -1,5 +1,9 @@
 # Change Log
 
+## 0.3.0 - 2023-04-19
+### Audio support for cards
+Cards can now have audio attached to them. The audio will automatically play when the card's reading is shown on srs reviews.
+
 ## 0.2.11 - 2023-04-18
 ### Add defaults meaning and reading mneumonics for cards added from the dictionary
 
