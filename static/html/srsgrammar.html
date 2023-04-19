@@ -1,0 +1,157 @@
+{{ define "windowtitle" }}SRS - ({{.LearningCount}}) {{.DueCount}} remaining{{ end }}
+{{ define "title" }}SRS - ({{.LearningCount}}) {{.DueCount}} remaining{{ end }}
+
+{{ define "content" }}
+
+{{ if .Card }}
+
+<div class="links">
+    <a href="/card/{{.Card.ID}}" target="_blank">View Card</a>
+    |
+    <a onclick="tagSuspended()">Tag as Suspended</a>
+</div>
+
+<hr>
+
+<br>
+
+{{ if eq .Card.LearningStageString "Up Next" }}
+<div class="srs-upnext">
+    <div class="srs-upnext-heading">Up Next</div>
+    <div class="srs-upnext-text">This card on your Up Next List.</div>
+</div>
+<br><br>
+{{ end }}
+
+<div class="srs-card">
+    <div class="srs-object-type">{{ .Card.Object }}</div>
+    <div class="{{ .Card.Object }}-highlight srs-jp-grammar">{{.SentenceHtml.Japanese}}</div>
+</div>
+
+<br>
+
+<div class="srs-answer-parent">
+    <div class="srs-answer-section" onclick="toggleAnswer()">
+        <div class="srs-heading">English</div>
+        <div class="srs-answer srs-hidden answer">
+            <div class="srs-english-sentence">{{ .SentenceHtml.English }}</div>
+        </div>
+    </div>
+
+    <div class="srs-answer-section" onclick="toggleAnswer()">
+        <div class="srs-heading">Meaning</div>
+        <div class="srs-answer srs-hidden answer">
+            {{ range .Card.Meanings }}
+            <div class="srs-meaning">{{ .Meaning }}</div>
+            {{ end }}
+        </div>
+    </div>
+
+    <div class="srs-answer-section" onclick="toggleAnswer()">
+        <div class="srs-heading">Usage</div>
+        <div class="srs-answer srs-hidden answer">
+            <div class="srs-usage">{{ .Card.Usage }}</div>
+        </div>
+    </div>
+
+    <div class="srs-answer-section" onclick="toggleAnswer()">
+        <div class="srs-heading">Reference</div>
+        <div class="srs-answer srs-hidden answer">
+            <div class="srs-reference">Dictionary of {{.Card.Volume}} Japanese Grammar: Page {{.Card.Page}}</div>
+        </div>
+    </div>
+
+    <div class="srs-answer-section" onclick="toggleAnswerInformation()">
+        <div class="srs-heading">Information</div>
+        <div class="srs-answer srs-hidden answer-information">
+            <div class="srs-information">Current Interval: {{ .Card.Interval }}</div>
+            <div class="srs-information">Learning Interval: {{ .Card.LearningInterval }}</div>
+        </div>
+    </div>
+</div>
+
+<div class="srs-submit srs-submit-hidden">
+    <div class="srs-submit-button srs-incorrect" onclick="window.location.href='/srs/incorrect/{{ .Card.ID }}'">
+        Incorrect</div>
+    <div class="srs-submit-button srs-correct" onclick="window.location.href='/srs/correct/{{ .Card.ID }}'">Correct
+    </div>
+</div>
+
+<script>
+    var answerShown = false;
+
+    function toggleAnswer() {
+        var x = document.getElementsByClassName("answer");
+        var i;
+        for (i = 0; i < x.length; i++) {
+            if (x[i].classList.contains("srs-hidden")) {
+                x[i].classList.remove("srs-hidden");
+                answerShown = true;
+            } else {
+                x[i].classList.add("srs-hidden");
+                answerShown = false;
+            }
+        }
+
+        if (answerShown) {
+            showSubmit("srs-submit");
+        } else {
+            hideSubmit("srs-submit");
+        }
+    }
+
+    function showSubmit(className) {
+        var x = document.getElementsByClassName(className);
+        var i;
+        for (i = 0; i < x.length; i++) {
+            x[i].classList.remove("srs-submit-hidden");
+        }
+    }
+
+    function hideSubmit(className) {
+        var x = document.getElementsByClassName(className);
+        var i;
+        for (i = 0; i < x.length; i++) {
+            x[i].classList.add("srs-submit-hidden");
+        }
+    }
+
+    function toggleAnswerInformation() {
+        var x = document.getElementsByClassName("answer-information");
+        var i;
+        for (i = 0; i < x.length; i++) {
+            if (x[i].classList.contains("srs-hidden")) {
+                x[i].classList.remove("srs-hidden");
+            } else {
+                x[i].classList.add("srs-hidden");
+            }
+        }
+    }
+
+    function tagSuspended() {
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", "/card/{{.Card.ID}}/tagsuspended", true);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.send(JSON.stringify({}));
+        xhr.onloadend = function () {
+            window.location.reload();
+        };
+    }
+</script>
+
+{{ else }}
+
+<div class="banner">
+    Congratulations! You have no cards due!
+</div>
+<br>
+<div class="srs-add-new-cards">
+    <a href="/srs/addupnextcards/5">Add 5 new cards</a><br>
+    <a href="/srs/addupnextcards/10">Add 10 new cards</a>
+</div>
+
+{{ end }}
+
+{{ end }}
+
+{{ template "templatemain.html" .}}

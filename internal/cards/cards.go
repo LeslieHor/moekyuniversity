@@ -52,6 +52,7 @@ func (cd *CardData) LoadCardJson() {
 	// Backup cards on start up, then update them
 	cd.BackupCardMap()
 	cd.UpdateCardData()
+	// cd.LoadGrammarJson()
 	cd.SaveCardMap()
 }
 
@@ -174,6 +175,15 @@ func (cd *CardData) FindVocabulary(vocabulary string) *Card {
 func (cd *CardData) FindKanji(kanji string) *Card {
 	for _, c := range cd.Cards {
 		if c.Object == "kanji" && c.Characters == kanji {
+			return c
+		}
+	}
+	return nil
+}
+
+func (cd *CardData) FindGrammar(grammar string) *Card {
+	for _, c := range cd.Cards {
+		if c.Object == "grammar" && c.Characters == grammar {
 			return c
 		}
 	}

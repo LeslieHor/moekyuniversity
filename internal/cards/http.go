@@ -85,6 +85,8 @@ func SetupRoutes(cd *CardData) {
 
 	r.HandleFunc("/kanjifrequency", cd.KanjiFrequencyHandler)
 
+	r.HandleFunc("/debug/addtoupnextqueue/{id}", cd.DebugAddToUpNextQueueHandler)
+
 	http.ListenAndServe(":8080", r)
 }
 
@@ -540,6 +542,12 @@ func (cd *CardData) OverviewByTypeHandler(w http.ResponseWriter, r *http.Request
 	cs = sortCardsById(cs)
 	lc = len(filterCardsByLearned(cs))
 	o = NewCardOverviewData("Vocabulary", cs, lc, true)
+	codl = append(codl, o)
+
+	cs = filterCardsByType(cl, "grammar")
+	cs = sortCardsById(cs)
+	lc = len(filterCardsByLearned(cs))
+	o = NewCardOverviewData("Grammar", cs, lc, true)
 	codl = append(codl, o)
 
 	cd.doTemplate(w, r, "cardoverview.html", codl)
@@ -1037,9 +1045,34 @@ func (cd *CardData) KanjiFrequencyHandler(w http.ResponseWriter, r *http.Request
 	cd.doTemplate(w, r, "kanjifrequency.html", pageData)
 }
 
+func (cd *CardData) DebugAddToUpNextQueueHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	cardId, err := strconv.Atoi(vars["id"])
+	if err != nil {
+		log.Printf("Error converting id to int: %s", err)
+		return
+	}
+
+	c := cd.GetCard(cardId)
+	cd.UpNext = append(cd.UpNext, c)
+
+	// Redirect to the card page
+	http.Redirect(w, r, fmt.Sprintf("/card/%d", cardId), http.StatusFound)
+}
+
 func (cd *CardData) SrsHandler(w http.ResponseWriter, r *http.Request) {
 	srsData := cd.GetNextSrsCard()
-	cd.doTemplate(w, r, "srs.html", srsData)
+	if srsData.Card == nil {
+		cd.doTemplate(w, r, "srs.html", srsData)
+		return
+	}
+
+	switch srsData.Card.Object {
+	case "grammar":
+		cd.doTemplate(w, r, "srsgrammar.html", srsData)
+	default:
+		cd.doTemplate(w, r, "srs.html", srsData)
+	}
 }
 
 func (cd *CardData) SrsCorrectHandler(w http.ResponseWriter, r *http.Request) {

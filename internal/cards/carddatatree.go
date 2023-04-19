@@ -11,6 +11,7 @@ type CardDataTree struct {
 	MeaningMnemonicHtml     template.HTML
 	ReadingMnemonicHtml     template.HTML
 	AmalgamationSubjectData []AmalgamationSubjectData
+	SentencesHtml           []SentenceHtml
 }
 
 type AmalgamationSubjectData struct {
@@ -22,12 +23,26 @@ type AmalgamationSubjectData struct {
 	LearningStageString string
 }
 
+type SentenceHtml struct {
+	Japanese template.HTML
+	English  template.HTML
+}
+
 func (c *Card) GetDataTree(cd *CardData) CardDataTree {
 	dt := recursivelyGenerateCardDataTree(cd, c)
 
 	// Convert custom html tags to span tags
 	dt.MeaningMnemonicHtml = template.HTML(customHtmlTagsToSpan(c.MeaningMnemonic))
 	dt.ReadingMnemonicHtml = template.HTML(customHtmlTagsToSpan(c.ReadingMnemonic))
+
+	var sentencesHtml []SentenceHtml
+	for _, s := range c.Sentences {
+		sentencesHtml = append(sentencesHtml, SentenceHtml{
+			Japanese: template.HTML(customHtmlTagsToSpan(s.Japanese)),
+			English:  template.HTML(customHtmlTagsToSpan(s.English)),
+		})
+	}
+	dt.SentencesHtml = sentencesHtml
 
 	// Generate amalgamation subject data
 	for _, id := range c.AmalgamationSubjectIDs {
@@ -66,6 +81,8 @@ func customHtmlTagsToSpan(str string) string {
 	str = strings.Replace(str, "</kanji>", "</span>", -1)
 	str = strings.Replace(str, "<vocabulary>", "<span class=\"inline-highlight vocabulary-highlight\">", -1)
 	str = strings.Replace(str, "</vocabulary>", "</span>", -1)
+	str = strings.Replace(str, "<grammar>", "<span class=\"inline-highlight grammar-highlight\">", -1)
+	str = strings.Replace(str, "</grammar>", "</span>", -1)
 
 	return str
 }

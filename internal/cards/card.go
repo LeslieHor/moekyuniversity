@@ -44,6 +44,11 @@ type Audio struct {
 	AutoPlay bool   `json:"autoplay"`
 }
 
+type Sentence struct {
+	English  string `json:"english"`
+	Japanese string `json:"japanese"`
+}
+
 type Card struct {
 	ID                          int       `json:"id"`
 	Object                      string    `json:"object"`
@@ -61,6 +66,12 @@ type Card struct {
 	MeaningMnemonic             string    `json:"meaning_mnemonic"`
 	ReadingMnemonic             string    `json:"reading_mnemonic"`
 	Audio                       []Audio   `json:"audio"`
+
+	// Grammar
+	Usage     string     `json:"usage"`
+	Sentences []Sentence `json:"sentences"`
+	Volume    string     `json:"volume"`
+	Page      string     `json:"page"`
 
 	Interval           int    `json:"interval"`          // Hours until next review
 	LearningInterval   int    `json:"learning_interval"` // Hours until next review when in learning stage

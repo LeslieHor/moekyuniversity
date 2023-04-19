@@ -131,10 +131,20 @@
     {{range $index, $element := .Card.Meanings}}{{if $index}}, {{end}}{{$element.Meaning}}{{end}}
 </div>
 
+{{if .Card.MeaningMnemonic}}
 <div class="section">
     <span class="heading">Meaning Mneumonic:</span>
     <div class="meaningmneumonicdescription">{{.MeaningMnemonicHtml}}</div>
 </div>
+{{end}}
+
+{{ if .Card.Usage }}
+<div class="section">
+    <div class="heading">Usage</div>
+    <div class="usage">
+        {{ .Card.Usage }}
+    </div>
+{{ end }}
 
 {{if .Card.Readings}}
 <div class="section"><span class="heading">Readings</span>
@@ -153,6 +163,28 @@
     <div class="readingmneumonicdescription">{{.ReadingMnemonicHtml}}</div>
 </div>
 {{end}}
+
+{{ if .Card.Sentences }}
+<div class="section">
+    <span class="heading">Sentences</span>
+    {{ range .SentencesHtml }}
+    <div class="sentence">
+        <div>
+            <span class="sentence-japanese">{{ .Japanese }}</span>
+        </div>
+        <div>
+            <span class="sentence-english">{{ .English }}</span>
+        </div>
+    </div>
+    {{ end }}
+</div>
+{{ end }}
+
+{{ if .Card.Volume }}
+<div class="section">
+    <span class="heading">Reference:</span>
+    <span class="reference">Dictionary of {{.Card.Volume}} Japanese Grammar: Page {{.Card.Page}}</span>
+{{ end }}
 
 {{ if .Card.Audio }}
 <div class="section">

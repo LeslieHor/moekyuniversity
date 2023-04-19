@@ -22,6 +22,7 @@ type Token struct {
 	BaseForm            string   // Actual word
 	PartsOfSpeech       []string // Parts of speech
 	Pronunciation       string   // Pronunciation in hiragana
+	IsGrammar           bool     // Is this a grammar point?
 	CardId              int      // ID of the matching card (if any)
 	LearningStage       LearningStage
 	LearningStageString string
@@ -54,6 +55,7 @@ func ConvertToken(token tokenizer.Token) Token {
 		Pronunciation: p,
 		Token:         token,
 	}
+	to.IsGrammar = IsGrammar(to)
 
 	return to
 }
@@ -76,7 +78,8 @@ func (ta *TextAnalysis) Analyse(cd *CardData) {
 
 		c := cd.FindVocabulary(to.BaseForm)
 		to.Card = c
-		if c == nil {
+
+		if to.Card == nil { // Look up in dictionary if no card was found
 			// Cache the dictionary entries that match this token
 			// Improves performance by approximately 3x (depending on the text)
 			key := to.BaseForm + to.Pronunciation
@@ -94,6 +97,15 @@ func (ta *TextAnalysis) Analyse(cd *CardData) {
 	log.Printf("Processed %d tokens in %s", len(tokens), endTime.Sub(startTime))
 	// debugJsonPrint(ts)
 	ta.Tokens = ts
+}
+
+func IsGrammar(to Token) bool {
+	for _, pos := range to.PartsOfSpeech {
+		if pos == "助動詞" || pos == "助詞" {
+			return true
+		}
+	}
+	return false
 }
 
 // Currently unused

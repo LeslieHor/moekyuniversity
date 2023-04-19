@@ -3,6 +3,7 @@ package cards
 import (
 	"html/template"
 	"log"
+	"math/rand"
 	"time"
 )
 
@@ -12,6 +13,7 @@ type SrsData struct {
 	Card                *Card
 	MeaningMnemonicHtml template.HTML
 	ReadingMnemonicHtml template.HTML
+	SentenceHtml        SentenceHtml
 }
 
 func (cd *CardData) GetNextSrsCard() SrsData {
@@ -57,6 +59,18 @@ func (cd *CardData) GetNextSrsCard() SrsData {
 	}
 
 	card = srsDueCards[0]
+
+	var sentenceHtml SentenceHtml
+	if card.Object == "grammar" {
+		log.Printf("Grammar card %d is due", card.ID)
+
+		// Pick a random sentence
+		sentence := card.Sentences[rand.Intn(len(card.Sentences))]
+		sentenceHtml = SentenceHtml{
+			Japanese: template.HTML(customHtmlTagsToSpan(sentence.Japanese)),
+			English:  template.HTML(customHtmlTagsToSpan(sentence.English)),
+		}
+	}
 	// Create SRS data
 	srsData := SrsData{
 		DueCount:      l,
@@ -68,6 +82,7 @@ func (cd *CardData) GetNextSrsCard() SrsData {
 		ReadingMnemonicHtml: template.HTML(
 			customHtmlTagsToSpan(
 				card.ReadingMnemonic)),
+		SentenceHtml: sentenceHtml,
 	}
 
 	return srsData

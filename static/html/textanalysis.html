@@ -32,7 +32,7 @@
 </div>
 {{ end }}
 
-{{ define "dictionary-text" }}<span class="ta-token token-missing"><span class="definition-tooltip"><a  class="a-none" href="/dictionaryentries?ids={{range $index, $element := .DictionaryEntries}}{{if $index}},{{end}}{{$element.ID}}{{end}}">{{ newlinetohtml .Surface}}</a><span class="definition-tooltiptext">{{ range .DictionaryEntries }}{{ template "dictionaryentry" . }}{{ end }}</span></span></span>{{ end }}
+{{ define "dictionary-text" }}<span class="ta-token token-missing{{if .IsGrammar}}token-grammar{{end}}"><span class="definition-tooltip"><a  class="a-none" href="/dictionaryentries?ids={{range $index, $element := .DictionaryEntries}}{{if $index}},{{end}}{{$element.ID}}{{end}}">{{ newlinetohtml .Surface}}</a><span class="definition-tooltiptext">{{ range .DictionaryEntries }}{{ template "dictionaryentry" . }}{{ end }}</span></span></span>{{ end }}
 
 {{ define "card-text" }}<span class="ta-token stage-{{ stripspaces .Card.LearningStageString }}"><span class="definition-tooltip"><a class="a-none" href="/card/{{.Card.ID}}">{{ newlinetohtml .Surface}}</a><span class="definition-tooltiptext">{{template "cardTooltip" .Card}}</span></span></span>{{ end }}
 

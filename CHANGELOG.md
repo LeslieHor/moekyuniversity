@@ -1,5 +1,9 @@
 # Change Log
 
+## 0.4.0 - 2023-04-19
+### Add support for grammar cards
+Grammar card support added. You can now learn grammar points by studying a random sentence that uses the grammar point.
+
 ## 0.3.0 - 2023-04-19
 ### Audio support for cards
 Cards can now have audio attached to them. The audio will automatically play when the card's reading is shown on srs reviews.
