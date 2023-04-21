@@ -46,34 +46,10 @@
         </div>
     </div>
 
-    <div class="srs-answer-section" onclick="toggleAnswerReading()">
-        <div class="srs-heading">Reading</div>
-        <div class="srs-answer srs-hidden answer-reading">
-            {{ if .Card.Readings }}
-            {{ range .Card.Readings }}
-            <div class="srs-reading {{if not .AcceptedAnswer}}srs-not-accepted{{end}}">{{ if .Type}}{{.Type}}: {{end}}{{
-                .Reading }}</div>
-            {{ end }}
-            {{ else }}
-            <div class="srs-reading">No Readings</div>
-            {{ end }}
-        </div>
-    </div>
     <div class="srs-answer-section" onclick="toggleAnswerMeaning()">
         <div class="srs-heading">Meaning Mneumonic</div>
         <div class="srs-answer srs-hidden answer-meaning">
             <div class="srs-meaning-mnemonic">{{ .MeaningMnemonicHtml }}</div>
-        </div>
-    </div>
-
-    <div class="srs-answer-section" onclick="toggleAnswerReading()">
-        <div class="srs-heading">Reading Mneumonic</div>
-        <div class="srs-answer srs-hidden answer-reading">
-            {{ if .ReadingMnemonicHtml }}
-            <div class="srs-reading-mnemonic">{{ .ReadingMnemonicHtml }}</div>
-            {{ else }}
-            <div class="srs-reading-mnemonic">No Reading Mneumonic</div>
-            {{ end }}
         </div>
     </div>
 
@@ -85,20 +61,6 @@
         </div>
     </div>
 
-    <div class="srs-answer-section">
-        <div class="srs-heading">Audio</div>
-        <div class="srs-answer srs-hidden answer-reading">
-            {{ if .Card.Audio }}
-            <div class="flow">
-                {{range $index, $element := .Card.Audio}}
-                <div class="audio-play-button" onclick="playAudio({{$element.Filename}})">▶</div>
-                {{end}}
-            </div>
-            {{else}}
-            <div class="srs-reading">No Audio</div>
-            {{end}}
-        </div>
-    </div>
 </div>
 
 <div class="srs-submit srs-submit-hidden">
@@ -113,31 +75,21 @@
     // toggle between hiding and showing the answers
     // When both meaning and reading are hidden, show the submit buttons
     var meaningShown = false;
-    var readingShown = false;
-    var audioFiles = [{{ range $index, $element:= .Card.Audio }}'{{$element.Filename}}', {{ end }}]
-
+    
     function toggleAnswer(className) {
         var x = document.getElementsByClassName(className);
         var i;
         for (i = 0; i < x.length; i++) {
             if (x[i].classList.contains("srs-hidden")) {
                 x[i].classList.remove("srs-hidden");
-                if (className == "answer-meaning") {
                     meaningShown = true;
-                } else if (className == "answer-reading") {
-                    readingShown = true;
-                }
             } else {
                 x[i].classList.add("srs-hidden");
-                if (className == "answer-meaning") {
                     meaningShown = false;
-                } else if (className == "answer-reading") {
-                    readingShown = false;
-                }
             }
         }
 
-        if (meaningShown && readingShown) {
+        if (meaningShown) {
             showSubmit("srs-submit");
         } else {
             hideSubmit("srs-submit");
@@ -183,29 +135,6 @@
         xhr.onloadend = function () {
             window.location.reload();
         };
-    }
-
-    function playAudio(filename) {
-        var audio = new Audio('/data/audio/' + filename);
-        audio.play();
-        // Remove the audio element after it has finished playing
-        audio.onended = function () {
-            audio.remove();
-        };
-    }
-
-    function playAudioList(i) {
-        if (i >= audioFiles.length) {
-            return;
-        }
-        var audio = new Audio('/data/audio/' + audioFiles[i]);
-        audio.play();
-        audio.onended = function () {
-            audio.remove();
-            if (i < audioFiles.length - 1) {
-                playAudioList(i + 1);
-            }
-        }
     }
 </script>
 

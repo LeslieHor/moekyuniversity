@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.4.1 - 2023-04-21
+- Show next time of reviews on the srs page when there are no reviews due
+- SRS incorrect / correct buttons now show the pointer cursor
+- Radicals no longer require revealing the reading on reviews
+- Search no longer shows duplicate results
+
 ## 0.4.0 - 2023-04-19
 ### Add support for grammar cards
 Grammar card support added. You can now learn grammar points by studying a random sentence that uses the grammar point.

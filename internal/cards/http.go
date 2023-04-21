@@ -1063,15 +1063,43 @@ func (cd *CardData) DebugAddToUpNextQueueHandler(w http.ResponseWriter, r *http.
 func (cd *CardData) SrsHandler(w http.ResponseWriter, r *http.Request) {
 	srsData := cd.GetNextSrsCard()
 	if srsData.Card == nil {
-		cd.doTemplate(w, r, "srs.html", srsData)
+		cd.doTemplate(w, r, "srsnomorecards.html", cd.GetNextScheduledHour())
 		return
 	}
 
 	switch srsData.Card.Object {
 	case "grammar":
 		cd.doTemplate(w, r, "srsgrammar.html", srsData)
+	case "radical":
+		cd.doTemplate(w, r, "srsradical.html", srsData)
 	default:
 		cd.doTemplate(w, r, "srs.html", srsData)
+	}
+}
+
+type SrsNoMoreCards struct {
+	NextHour  string
+	NumberDue int
+}
+
+func (cd *CardData) GetNextScheduledHour() SrsNoMoreCards {
+	// Go through each hour until you find one that has cards due
+
+	cards := cd.ToList()
+	t1 := time.Now().Add(time.Hour).Truncate(time.Hour)
+	t2 := t1.Add(time.Hour)
+	for {
+		cs := filterCardsByDueBetween(cards, t1, t2)
+		if len(cs) > 0 {
+			s := SrsNoMoreCards{
+				NextHour:  t2.Format("15:04"),
+				NumberDue: len(cs),
+			}
+			return s
+		}
+
+		t1 = t1.Add(time.Hour)
+		t2 = t2.Add(time.Hour)
 	}
 }
 

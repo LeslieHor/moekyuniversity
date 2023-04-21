@@ -423,19 +423,20 @@ func (cd *CardData) ToList() []*Card {
 func (cd *CardData) Search(search string) []*Card {
 	var cards []*Card
 
-	// Search characters
+	// Search characters and meanings
 	for _, card := range cd.Cards {
 		if strings.Contains(card.Characters, search) {
-			cards = append(cards, card)
+			if !containsCard(cards, card) {
+				cards = append(cards, card)
+			}
 		}
-	}
 
-	// Search meanings
-	for _, card := range cd.Cards {
 		for _, meaning := range card.Meanings {
 			if strings.Contains(strings.ToLower(meaning.Meaning),
 				strings.ToLower(search)) {
-				cards = append(cards, card)
+				if !containsCard(cards, card) {
+					cards = append(cards, card)
+				}
 			}
 		}
 	}
@@ -528,6 +529,15 @@ func containsString(s []string, e string) bool {
 }
 
 func containsInt(s []int, e int) bool {
+	for _, a := range s {
+		if a == e {
+			return true
+		}
+	}
+	return false
+}
+
+func containsCard(s []*Card, e *Card) bool {
 	for _, a := range s {
 		if a == e {
 			return true

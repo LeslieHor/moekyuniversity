@@ -408,6 +408,10 @@ a {
 
 }
 
+.srs-submit-button:hover {
+    cursor: pointer;
+}
+
 .srs-correct {
     background-color: rgb(47, 179, 47);
 }
@@ -425,8 +429,14 @@ a {
 }
 
 .banner {
+    color: rgb(155, 155, 155);
     text-align: center;
     font-size: 3.0em;
+}
+
+.subbanner {
+    text-align: center;
+    font-size: 2.0em;
 }
 
 .srs-congratulations {

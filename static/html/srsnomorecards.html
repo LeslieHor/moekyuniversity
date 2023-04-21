@@ -1,0 +1,21 @@
+{{ define "windowtitle" }}SRS - (0) 0 remaining{{ end }}
+{{ define "title" }}SRS - (0) 0 remaining{{ end }}
+
+{{ define "content" }}
+
+<div class="banner">
+    Congratulations! You have no cards due!
+</div>
+<br>
+<div class="subbanner">
+    Come back at {{.NextHour}} to review {{.NumberDue}} cards.
+</div>
+<br>
+<div class="srs-add-new-cards">
+    <a href="/srs/addupnextcards/5">Add 5 new cards</a><br>
+    <a href="/srs/addupnextcards/10">Add 10 new cards</a>
+</div>
+
+{{ end }}
+
+{{ template "templatemain.html" .}}
