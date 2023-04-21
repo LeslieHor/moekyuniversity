@@ -1,6 +1,43 @@
 {{ define "windowtitle" }}SRS - ({{.LearningCount}}) {{.DueCount}} remaining{{ end }}
 {{ define "title" }}SRS - ({{.LearningCount}}) {{.DueCount}} remaining{{ end }}
 
+{{ define "dictionaryentry" }}
+<div class="dictionary-entry">
+    {{if .Expressions}}
+    <div class="dictionary-expressions">{{range $index, $element := .Expressions}}{{if $index}};
+        {{end}}{{$element}}{{end}}</div>
+    {{else}}
+    <div class="dictionary-expressions">{{range $index, $element := .Readings}}{{if $index}};
+        {{end}}{{$element}}{{end}}</div>
+    {{end}}
+    <div class="dictionary-readings">Readings:{{range $index, $element := .Readings}}{{if $index}};
+        {{end}}{{$element}}{{end}}</div>
+    {{range .Definitions}}
+    <div class="dictionary-parts-of-speech">{{range $index, $element := .PartsOfSpeech}}{{if $index}};
+        {{end}}{{$element}}{{end}}</div>
+    <div class="dictionary-definitions">{{range $index, $element := .Definitions}}{{if $index}};
+        {{end}}{{$element}}{{end}}</div>
+    {{end}}
+</div>
+{{ end }}
+
+{{ define "cardTooltip" }}
+<div class="card-tooltip">
+    <div class="card-characters">{{.Characters}}</div>
+    <div class="card-readings">Readings: {{range $index, $element := .Readings}}{{if $index}}; {{end}}{{$element.Reading}}{{end}}</div>
+    <div class="card-parts-of-speech">{{range $index, $element := .PartsOfSpeech}}{{if $index}};
+        {{end}}{{$element}}{{end}}</div>
+    <div class="card-meanings">{{range $index, $element := .Meanings}}{{if $index}}; {{end}}{{$element.Meaning}}{{end}}
+    </div>
+</div>
+{{ end }}
+
+{{ define "dictionary-text" }}<span class="ta-token token-missing{{if .IsGrammar}}token-grammar{{end}}"><span class="definition-tooltip"><a  class="a-none" href="/dictionaryentries?ids={{range $index, $element := .DictionaryEntries}}{{if $index}},{{end}}{{$element.ID}}{{end}}">{{ newlinetohtml .Surface}}</a><span class="definition-tooltiptext">{{ range .DictionaryEntries }}{{ template "dictionaryentry" . }}{{ end }}</span></span></span>{{ end }}
+
+{{ define "card-text" }}<span class="ta-token stage-{{ stripspaces .Card.LearningStageString }}"><span class="definition-tooltip"><a class="a-none" href="/card/{{.Card.ID}}">{{ newlinetohtml .Surface}}</a><span class="definition-tooltiptext">{{template "cardTooltip" .Card}}</span></span></span>{{ end }}
+
+{{ define "none-text" }}<span class="ta-token token-none">{{ newlinetohtml .Surface}}</span>{{ end }}
+
 {{ define "content" }}
 
 {{ if .Card }}
@@ -25,7 +62,7 @@
 
 <div class="srs-card">
     <div class="srs-object-type">{{ .Card.Object }}</div>
-    <div class="{{ .Card.Object }}-highlight srs-jp-grammar">{{.SentenceHtml.Japanese}}</div>
+    <div class="{{ .Card.Object }}-highlight srs-jp-grammar">{{range .Tokens}}{{if .Card}}{{template "card-text" . }}{{ else if .DictionaryEntries}}{{template "dictionary-text" .}}{{else}}{{template "none-text" .}}{{end}}{{end}}</div>
 </div>
 
 <br>

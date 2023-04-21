@@ -4,6 +4,7 @@ import (
 	"html/template"
 	"log"
 	"math/rand"
+	"strings"
 	"time"
 )
 
@@ -14,6 +15,7 @@ type SrsData struct {
 	MeaningMnemonicHtml template.HTML
 	ReadingMnemonicHtml template.HTML
 	SentenceHtml        SentenceHtml
+	Tokens              []Token
 }
 
 func (cd *CardData) GetNextSrsCard() SrsData {
@@ -59,6 +61,7 @@ func (cd *CardData) GetNextSrsCard() SrsData {
 	}
 
 	card = srsDueCards[0]
+	var srsData SrsData
 
 	var sentenceHtml SentenceHtml
 	if card.Object == "grammar" {
@@ -70,20 +73,38 @@ func (cd *CardData) GetNextSrsCard() SrsData {
 			Japanese: template.HTML(customHtmlTagsToSpan(sentence.Japanese)),
 			English:  template.HTML(customHtmlTagsToSpan(sentence.English)),
 		}
+
+		// Get the tokens for the sentence
+		// Replace the grammar tags with unprintable characters
+		// This is because the tokenizer doesn't know what to do with them
+		str := sentence.Japanese
+		str = strings.Replace(str, "<grammar>", "\u0000", -1)
+		str = strings.Replace(str, "</grammar>", "\u0001", -1)
+
+		// Create a new TextAnalysis object
+		ta := TextAnalysis{
+			Text: str,
+		}
+		ta.Analyse(cd)
+
+		// Find the unprintable characters and replace the tokens that are in between them with the grammar tags
+		for i, token := range ta.Tokens {
+			if token.Surface == "\u0000" {
+				ta.Tokens[i+1].Surface = "<span class=\"inline-highlight grammar-highlight\">" + ta.Tokens[i+1].Surface
+			} else if token.Surface == "\u0001" {
+				ta.Tokens[i-1].Surface = ta.Tokens[i-1].Surface + "</span>"
+			}
+		}
+
+		srsData.Tokens = ta.Tokens
 	}
 	// Create SRS data
-	srsData := SrsData{
-		DueCount:      l,
-		LearningCount: len(learningCards),
-		Card:          card,
-		MeaningMnemonicHtml: template.HTML(
-			customHtmlTagsToSpan(
-				card.MeaningMnemonic)),
-		ReadingMnemonicHtml: template.HTML(
-			customHtmlTagsToSpan(
-				card.ReadingMnemonic)),
-		SentenceHtml: sentenceHtml,
-	}
+	srsData.DueCount = l
+	srsData.LearningCount = len(learningCards)
+	srsData.Card = card
+	srsData.MeaningMnemonicHtml = template.HTML(customHtmlTagsToSpan(card.MeaningMnemonic))
+	srsData.ReadingMnemonicHtml = template.HTML(customHtmlTagsToSpan(card.ReadingMnemonic))
+	srsData.SentenceHtml = sentenceHtml
 
 	return srsData
 }
