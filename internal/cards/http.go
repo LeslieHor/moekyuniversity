@@ -1086,7 +1086,7 @@ func (cd *CardData) GetNextScheduledHour() SrsNoMoreCards {
 	// Go through each hour until you find one that has cards due
 
 	cards := cd.ToList()
-	t1 := time.Now().Add(time.Hour).Truncate(time.Hour)
+	t1 := time.Now().Truncate(time.Hour)
 	t2 := t1.Add(time.Hour)
 	for {
 		cs := filterCardsByDueBetween(cards, t1, t2)
