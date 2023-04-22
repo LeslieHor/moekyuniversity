@@ -1,0 +1,62 @@
+{{ define "windowtitle" }}Historical Data{{ end }}
+{{ define "title" }}Historical Data{{ end }}
+
+{{ define "content" }}
+
+<div class="section">
+    Historical Data. Max of bar is the maximum number of items known at any point in time.
+</div>
+
+<table>
+    <tr>
+        <th>Date</th>
+        <th>Radicals</th>
+        <th></th>
+        <th>Kanji</th>
+        <th></th>
+        <th>Vocabulary</th>
+        <th></th>
+        <th>Grammar</th>
+        <th></th>
+    </tr>
+    {{ $root := . }}
+    {{ $width := 100 }}
+    {{ $margin := 30}}
+    {{ range $index, $element := .HistoricalDataEntries }}
+    <tr>
+        <td style="width: {{$width}}px;">{{$element.DateTime}}</td>
+        <td>{{$element.RadicalsKnown}} / {{$root.RadicalCount}}</td>
+        <td style="width: {{ (add $width $margin) }}px;">
+            <div class="flow">
+                <div class="graph-bar radical-highlight" style="width: {{ (div (mul $element.RadicalsKnown $width ) $root.RadicalMax)}}px;"></div>
+                <div class="graph-bar-remaining" style="width: {{ (sub $width (div (mul $element.RadicalsKnown $width ) $root.RadicalMax))}}px;"></div>
+            </div>
+        </td>
+        <td>{{$element.KanjiKnown}} / {{$root.KanjiCount}}</td>
+        <td style="width: {{ (add $width $margin) }}px;">
+            <div class="flow">
+                <div class="graph-bar kanji-highlight" style="width: {{ (div (mul $element.KanjiKnown $width ) $root.KanjiMax)}}px;"></div>
+                <div class="graph-bar-remaining" style="width: {{ (sub $width (div (mul $element.KanjiKnown $width ) $root.KanjiMax))}}px;"></div>
+            </div>
+        </td>
+        <td>{{$element.VocabularyKnown}} / {{$root.VocabularyCount}}</td>
+        <td style="width: {{ (add $width $margin) }}px;">
+            <div class="flow">
+                <div class="graph-bar vocabulary-highlight" style="width: {{ (div (mul $element.VocabularyKnown $width ) $root.VocabularyMax)}}px;"></div>
+                <div class="graph-bar-remaining" style="width: {{ (sub $width (div (mul $element.VocabularyKnown $width ) $root.VocabularyMax))}}px;"></div>
+            </div>
+        </td>
+        <td>{{$element.GrammarKnown}} / {{$root.GrammarCount}}</td>
+        <td style="width: {{$width}}px;">
+            <div class="flow">
+                <div class="graph-bar grammar-highlight" style="width: {{ (div (mul $element.GrammarKnown $width ) $root.GrammarMax)}}px;"></div>
+                <div class="graph-bar-remaining" style="width: {{ (sub $width (div (mul $element.GrammarKnown $width ) $root.GrammarMax))}}px;"></div>
+            </div>
+        </td>
+    </tr>
+    {{ end }}
+</table>
+
+{{ end }}
+
+{{ template "templatemain.html" .}}

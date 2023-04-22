@@ -1,5 +1,9 @@
 # Change Log
 
+## 0.5.0 - 2023-04-22
+### Add historical stats page
+The `/historicalstats` page will show you how many cards of different types you have learned over time. Stats are collecting automatically every day.
+
 ## 0.4.1 - 2023-04-21
 - Show next time of reviews on the srs page when there are no reviews due
 - SRS incorrect / correct buttons now show the pointer cursor

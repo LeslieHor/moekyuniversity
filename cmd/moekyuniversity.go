@@ -30,5 +30,6 @@ func main() {
 	}
 	cardData.LoadCardJson()
 	cardData.LoadDictionary()
+	go cards.DoHistoricalData(&cardData)
 	cards.SetupRoutes(&cardData)
 }

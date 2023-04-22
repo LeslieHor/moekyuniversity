@@ -590,6 +590,15 @@ a {
     margin-right: 10px;
 }
 
+.graph-bar{
+    height: 20px;
+}
+
+.graph-bar-remaining {
+    height: 20px;
+    background-color: rgb(146, 146, 146);
+}
+
 .schedule-bar {
     height: 20px;
     background-color: rgb(58, 127, 255);
@@ -665,4 +674,8 @@ a {
 .srs-jp-grammar .grammar-highlight {
     color: rgb(0, 0, 0);
     background-color: rgb(124, 255, 91);
+}
+
+.margin-right {
+    margin-right: 10px;
 }

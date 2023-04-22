@@ -83,7 +83,9 @@ func SetupRoutes(cd *CardData) {
 	r.HandleFunc("/dictionaryentries", cd.DictionaryEntriesHandler)
 	r.HandleFunc("/adddictionaryascard/{id}", cd.AddDictionaryAsCardHandler)
 
+	r.HandleFunc("/other", cd.OtherHandler)
 	r.HandleFunc("/kanjifrequency", cd.KanjiFrequencyHandler)
+	r.HandleFunc("/historicalstats", cd.HistoricalStatsHandler)
 
 	r.HandleFunc("/debug/addtoupnextqueue/{id}", cd.DebugAddToUpNextQueueHandler)
 
@@ -1030,6 +1032,10 @@ func (cd *CardData) AddDictionaryAsCardHandler(w http.ResponseWriter, r *http.Re
 	http.Redirect(w, r, fmt.Sprintf("/card/%d", c.ID), http.StatusFound)
 }
 
+func (cd *CardData) OtherHandler(w http.ResponseWriter, r *http.Request) {
+	cd.doTemplate(w, r, "other.html", nil)
+}
+
 type KanjiFrequencyData struct {
 	Name         string
 	TotalPercent int
@@ -1043,6 +1049,10 @@ func (cd *CardData) KanjiFrequencyHandler(w http.ResponseWriter, r *http.Request
 		KanjiFrequencyData: kf,
 	}
 	cd.doTemplate(w, r, "kanjifrequency.html", pageData)
+}
+
+func (cd *CardData) HistoricalStatsHandler(w http.ResponseWriter, r *http.Request) {
+	cd.doTemplate(w, r, "historicalstats.html", cd.GetHistoricalData())
 }
 
 func (cd *CardData) DebugAddToUpNextQueueHandler(w http.ResponseWriter, r *http.Request) {

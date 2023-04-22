@@ -1,12 +1,16 @@
 package cards
 
 import (
+	"encoding/csv"
 	"encoding/json"
+	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
 	"sort"
+	"strconv"
 	"strings"
 	"time"
 
@@ -52,7 +56,6 @@ func (cd *CardData) LoadCardJson() {
 	// Backup cards on start up, then update them
 	cd.BackupCardMap()
 	cd.UpdateCardData()
-	// cd.LoadGrammarJson()
 	cd.SaveCardMap()
 }
 
@@ -114,6 +117,162 @@ func (cd *CardData) SaveCardMapToFilename(path string) {
 	err = ioutil.WriteFile(path, cardJson, 0644)
 	if err != nil {
 		log.Fatal(err)
+	}
+}
+
+type HistoricalData struct {
+	HistoricalDataEntries []*HistoricalDataEntry
+	RadicalCount          int
+	KanjiCount            int
+	VocabularyCount       int
+	GrammarCount          int
+	RadicalMax            int
+	KanjiMax              int
+	VocabularyMax         int
+	GrammarMax            int
+}
+
+type HistoricalDataEntry struct {
+	DateTime        string // RFC3339
+	RadicalsKnown   int
+	KanjiKnown      int
+	VocabularyKnown int
+	GrammarKnown    int
+}
+
+func (cd *CardData) GetHistoricalData() HistoricalData {
+	// Load historical data csv
+	historicalData := HistoricalData{}
+	historicalDataFile, err := os.Open(filepath.Join(cd.DataDir, "historical-data.csv"))
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer historicalDataFile.Close()
+
+	historicalDataCsv := csv.NewReader(historicalDataFile)
+	historicalDataCsv.Comma = ','
+
+	radicalMax := 0
+	kanjiMax := 0
+	vocabularyMax := 0
+	grammarMax := 0
+
+	for {
+		record, err := historicalDataCsv.Read()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		dateTime := record[0]
+		radicalsKnown, _ := strconv.Atoi(record[1])
+		kanjiKnown, _ := strconv.Atoi(record[2])
+		vocabularyKnown, _ := strconv.Atoi(record[3])
+		grammarKnown, _ := strconv.Atoi(record[4])
+
+		if radicalsKnown > radicalMax {
+			radicalMax = radicalsKnown
+		}
+		if kanjiKnown > kanjiMax {
+			kanjiMax = kanjiKnown
+		}
+		if vocabularyKnown > vocabularyMax {
+			vocabularyMax = vocabularyKnown
+		}
+		if grammarKnown > grammarMax {
+			grammarMax = grammarKnown
+		}
+
+		historicalDataEntry := HistoricalDataEntry{
+			DateTime:        dateTime,
+			RadicalsKnown:   radicalsKnown,
+			KanjiKnown:      kanjiKnown,
+			VocabularyKnown: vocabularyKnown,
+			GrammarKnown:    grammarKnown,
+		}
+
+		historicalData.HistoricalDataEntries = append(historicalData.HistoricalDataEntries, &historicalDataEntry)
+	}
+
+	historicalData.RadicalMax = radicalMax
+	historicalData.KanjiMax = kanjiMax
+	historicalData.VocabularyMax = vocabularyMax
+	historicalData.GrammarMax = grammarMax
+
+	// Calculate total counts
+	radicalCount := 0
+	kanjiCount := 0
+	vocabularyCount := 0
+	grammarCount := 0
+	for _, c := range cd.Cards {
+		switch c.Object {
+		case "radical":
+			radicalCount++
+		case "kanji":
+			kanjiCount++
+		case "vocabulary":
+			vocabularyCount++
+		case "grammar":
+			grammarCount++
+		}
+	}
+
+	historicalData.RadicalCount = radicalCount
+	historicalData.KanjiCount = kanjiCount
+	historicalData.VocabularyCount = vocabularyCount
+	historicalData.GrammarCount = grammarCount
+
+	return historicalData
+}
+
+func (cd *CardData) SaveHistoricalData() {
+	// Gather historical data
+	dateTime := time.Now().Format("2006-01-02")
+	radicalsKnown := 0
+	kanjiKnown := 0
+	vocabularyKnown := 0
+	grammarKnown := 0
+
+	for _, c := range cd.Cards {
+		if c.LearningStage != Learned && c.LearningStage != Burned {
+			continue
+		}
+		switch c.Object {
+		case "radical":
+			radicalsKnown++
+		case "kanji":
+			kanjiKnown++
+		case "vocabulary":
+			vocabularyKnown++
+		case "grammar":
+			grammarKnown++
+		}
+	}
+
+	// Save historical data
+	csvLine := fmt.Sprintf("%s,%d,%d,%d,%d", dateTime, radicalsKnown, kanjiKnown, vocabularyKnown, grammarKnown)
+	historicalDataFile, err := os.OpenFile(filepath.Join(cd.DataDir, "historical-data.csv"), os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer historicalDataFile.Close()
+
+	log.Printf("Saving historical data: %s", csvLine)
+	_, err = historicalDataFile.WriteString(csvLine + "\n")
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func DoHistoricalData(cd *CardData) {
+	for {
+		// Wait until the next day at 00:00 and then save historical data
+		nextMidnight := time.Now().AddDate(0, 0, 1).Truncate(24 * time.Hour)
+		log.Printf("Waiting until %s to save historical data", nextMidnight.Format("2006-01-02 15:04:05"))
+		time.Sleep(time.Until(nextMidnight))
+		cd.SaveHistoricalData()
 	}
 }
 
