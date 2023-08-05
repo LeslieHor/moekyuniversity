@@ -1,5 +1,8 @@
 # Change Log
 
+## 0.5.1 - 2023-08-05
+Disable tap to zoom to remove tap delay on touch interfaces.
+
 ## 0.5.0 - 2023-04-22
 ### Add historical stats page
 The `/historicalstats` page will show you how many cards of different types you have learned over time. Stats are collecting automatically every day.
