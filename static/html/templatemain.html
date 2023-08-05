@@ -5,7 +5,7 @@
     <title>{{ block "windowtitle" .}}{{ end }}</title>
     <link rel="stylesheet" href="/stylesheet.css">
     <script>
-        javascript:(()=>{document.documentElement.style="touch-action: manipulation;"})() 
+        document.documentElement.style="touch-action: manipulation;";
 
         window.onload = function () {
             var urlParams = new URLSearchParams(window.location.search);
